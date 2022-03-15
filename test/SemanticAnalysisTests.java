@@ -103,6 +103,98 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
 
     // ---------------------------------------------------------------------------------------------
 
+    @Test public void testNumericArrayOperation() {
+        // multiplication
+        successInput("return [1, 2, 7] * [8, 5, 7]");
+        successInput("return [-1, 3265, -3] * [4, -6985, 0]");
+
+        successInput("return [1.3, 0.0, -45.369] * [4, -6985, 0]");
+        successInput("return [4, -6985, 0] * [1.3, 0.0, -45.369]");
+        successInput("return [0.0, -2589.36452, 8957.2] * [1.3, 0.0, -45.369]");
+
+        failureInputWith("return [true, false, true] * [8, 5, 7]", "Trying to multiply Bool[] with Int[]");
+        failureInputWith("return [-1, 0, 547] * [true, false, true]", "Trying to multiply Int[] with Bool[]");
+        failureInputWith("return [null, null, null] * [8, 5, 7]", "Trying to multiply Null[] with Int[]");
+        failureInputWith("return [-1, 0, 547] * [null, null, null]", "Trying to multiply Int[] with Null[]");
+        failureInputWith("return [\"oui\", \"\", \"123\"] * [8, 5, 7]", "Trying to multiply String[] with Int[]");
+        failureInputWith("return [-1, 0, 547] * [\"oui\", \"\", \"123\"]", "Trying to multiply Int[] with String[]");
+
+        failureInputWith("return [true, false, true] * [1.3, 0.0, -45.369]", "Trying to multiply Bool[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] * [true, false, true]", "Trying to multiply Float[] with Bool[]");
+        failureInputWith("return [null, null, null] * [1.3, 0.0, -45.369]", "Trying to multiply Null[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] * [null, null, null]", "Trying to multiply Float[] with Null[]");
+        failureInputWith("return [\"oui\", \"\", \"123\"] * [1.3, 0.0, -45.369]", "Trying to multiply String[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] * [\"oui\", \"\", \"123\"]", "Trying to multiply Float[] with String[]");
+
+        // division
+        successInput("return [1, 2, 7] / [8, 5, 7]");
+        successInput("return [-1, 3265, -3] / [4, -6985, 1]");
+
+        successInput("return [1.3, 0.0, -45.369] / [4, -6985, 1]");
+        successInput("return [4, -6985, 0] / [1.3, 5.36, -45.369]");
+        successInput("return [0.0, -2589.36452, 8957.2] / [1.3, 5.36, -45.369]");
+
+        failureInputWith("return [true, false, true] / [8, 5, 7]", "Trying to divide Bool[] with Int[]");
+        failureInputWith("return [-1, 0, 547] / [true, false, true]", "Trying to divide Int[] with Bool[]");
+        failureInputWith("return [null, null, null] / [8, 5, 7]", "Trying to divide Null[] with Int[]");
+        failureInputWith("return [-1, 0, 547] / [null, null, null]", "Trying to divide Int[] with Null[]");
+        failureInputWith("return [\"oui\", \"\", \"123\"] / [8, 5, 7]", "Trying to divide String[] with Int[]");
+        failureInputWith("return [-1, 0, 547] / [\"oui\", \"\", \"123\"]", "Trying to divide Int[] with String[]");
+
+        failureInputWith("return [true, false, true] / [1.3, 0.0, -45.369]", "Trying to divide Bool[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] / [true, false, true]", "Trying to divide Float[] with Bool[]");
+        failureInputWith("return [null, null, null] / [1.3, 0.0, -45.369]", "Trying to divide Null[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] / [null, null, null]", "Trying to divide Float[] with Null[]");
+        failureInputWith("return [\"oui\", \"\", \"123\"] / [1.3, 0.0, -45.369]", "Trying to divide String[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] / [\"oui\", \"\", \"123\"]", "Trying to divide Float[] with String[]");
+
+        // addition
+        successInput("return [1, 2, 7] + [8, 5, 7]");
+        successInput("return [-1, 3265, -3] + [4, -6985, 0]");
+
+        successInput("return [1.3, 0.0, -45.369] + [4, -6985, 0]");
+        successInput("return [4, -6985, 0] + [1.3, 0.0, -45.369]");
+        successInput("return [0.0, -2589.36452, 8957.2] + [1.3, 0.0, -45.369]");
+
+        failureInputWith("return [true, false, true] + [8, 5, 7]", "Trying to add Bool[] with Int[]");
+        failureInputWith("return [-1, 0, 547] + [true, false, true]", "Trying to add Int[] with Bool[]");
+        failureInputWith("return [null, null, null] + [8, 5, 7]", "Trying to add Null[] with Int[]");
+        failureInputWith("return [-1, 0, 547] + [null, null, null]", "Trying to add Int[] with Null[]");
+        failureInputWith("return [\"oui\", \"\", \"123\"] + [8, 5, 7]", "Trying to add String[] with Int[]");
+        failureInputWith("return [-1, 0, 547] + [\"oui\", \"\", \"123\"]", "Trying to add Int[] with String[]");
+
+        failureInputWith("return [true, false, true] + [1.3, 0.0, -45.369]", "Trying to add Bool[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] + [true, false, true]", "Trying to add Float[] with Bool[]");
+        failureInputWith("return [null, null, null] + [1.3, 0.0, -45.369]", "Trying to add Null[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] + [null, null, null]", "Trying to add Float[] with Null[]");
+        failureInputWith("return [\"oui\", \"\", \"123\"] + [1.3, 0.0, -45.369]", "Trying to add String[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] + [\"oui\", \"\", \"123\"]", "Trying to add Float[] with String[]");
+
+        // subtraction
+        successInput("return [1, 2, 7] - [8, 5, 7]");
+        successInput("return [-1, 3265, -3] - [4, -6985, 0]");
+
+        successInput("return [1.3, 0.0, -45.369] - [4, -6985, 0]");
+        successInput("return [4, -6985, 0] - [1.3, 0.0, -45.369]");
+        successInput("return [0.0, -2589.36452, 8957.2] - [1.3, 0.0, -45.369]");
+
+        failureInputWith("return [true, false, true] - [8, 5, 7]", "Trying to subtract Bool[] with Int[]");
+        failureInputWith("return [-1, 0, 547] - [true, false, true]", "Trying to subtract Int[] with Bool[]");
+        failureInputWith("return [null, null, null] - [8, 5, 7]", "Trying to subtract Null[] with Int[]");
+        failureInputWith("return [-1, 0, 547] - [null, null, null]", "Trying to subtract Int[] with Null[]");
+        failureInputWith("return [\"oui\", \"\", \"123\"] - [8, 5, 7]", "Trying to subtract String[] with Int[]");
+        failureInputWith("return [-1, 0, 547] - [\"oui\", \"\", \"123\"]", "Trying to subtract Int[] with String[]");
+
+        failureInputWith("return [true, false, true] - [1.3, 0.0, -45.369]", "Trying to subtract Bool[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] - [true, false, true]", "Trying to subtract Float[] with Bool[]");
+        failureInputWith("return [null, null, null] - [1.3, 0.0, -45.369]", "Trying to subtract Null[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] - [null, null, null]", "Trying to subtract Float[] with Null[]");
+        failureInputWith("return [\"oui\", \"\", \"123\"] - [1.3, 0.0, -45.369]", "Trying to subtract String[] with Float[]");
+        failureInputWith("return [1.3, 0.0, -45.369] - [\"oui\", \"\", \"123\"]", "Trying to subtract Float[] with String[]");
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
     @Test public void testOtherBinary() {
         successInput("return true && false");
         successInput("return false && true");

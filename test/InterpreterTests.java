@@ -165,6 +165,51 @@ public final class InterpreterTests extends TestFixture {
     // ---------------------------------------------------------------------------------------------
 
     @Test
+    public void testNumericArrayOp () {
+        // multiplication
+        checkExpr("[1, 2, 7] * [8, 5, 7]", new Object[]{8L, 10L, 49L});
+        checkExpr("[-1, 1, 0] * [3.2, -1.3658, 0.0]", new Object[]{-3.2, -1.3658, 0.0});
+        checkExpr("[3.2, -1.3658, 0.0] * [-1, 1, 0]", new Object[]{-3.2, -1.3658, 0.0});
+        checkExpr("[3.2, -1.3658, 0.0] * [0.0, 1.753, -1.654]", new Object[]{0.0, -2.3942474, -0.0});
+        // division
+        checkExpr("[1, 2, -12] / [8, 5, 7]", new Object[]{0L, 0L, -1L});
+        checkExpr("[-1, 1, 0] / [3.2, -1.3658, 0.001]", new Object[]{-0.3125, -0.732171621027969, 0.0});
+        checkExpr("[3.2, -1.3658, 21.3] / [-1, 1, 8963]", new Object[]{-3.2, -1.3658, 0.0023764364610063594});
+        checkExpr("[3.2, -1.3658, 0.0] / [0.01, 1.753, -1.654]", new Object[]{320.0, -0.7791215059897318, -0.0});
+        // addition
+        checkExpr("[1, 2, -12] + [8, 5, 7]", new Object[]{9L, 7L, -5L});
+        checkExpr("[-1, 1, 0] + [3.2, -1.3658, 0.001]", new Object[]{2.2, -0.3657999999999999, 0.001});
+        checkExpr("[3.2, -1.3658, 21.3] + [-1, 1, 8963]", new Object[]{2.2, -0.3657999999999999, 8984.3});
+        checkExpr("[3.2, -1.3658, 0.0] + [0.0, 1.753, -1.654]", new Object[]{3.2, 0.3872, -1.654});
+        // subtraction
+        checkExpr("[1, 2, -12] - [8, 5, 7]", new Object[]{-7L, -3L, -19L});
+        checkExpr("[-1, 1, 0] - [3.2, -1.3658, 0.001]", new Object[]{-4.2, 2.3658, -0.001});
+        checkExpr("[3.2, -1.3658, 21.3] - [-1, 1, 8963]", new Object[]{4.2, -2.3658, -8941.7});
+        checkExpr("[3.2, -1.3658, 0.0] - [0.0, 1.753, -1.654]", new Object[]{3.2, -3.1188, 1.654});
+
+        // division by 0
+        checkThrows("[-1, 1, 1] / [3, -1, 0]", AssertionError.class);
+        checkExpr("[-1, 1, 1] / [3.0, -1.0, 0.0]", new Object[]{-0.3333333333333333, -1.0, Double.POSITIVE_INFINITY});
+        checkExpr("[-1.0, 1.0, 1.0] / [3.0, -1.0, 0.0]", new Object[]{-0.3333333333333333, -1.0, Double.POSITIVE_INFINITY});
+
+        // operation on two arrays of different length and null length
+        checkThrows("[-1, 1, 1] + [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
+        checkThrows("[-1, 1, 1, 13] + [3.0, -1.0, 0.0]", AssertionError.class);
+        checkThrows("[] + []", AssertionError.class);
+        checkThrows("[-1, 1, 1] - [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
+        checkThrows("[-1, 1, 1, 13] - [3.0, -1.0, 0.0]", AssertionError.class);
+        checkThrows("[] - []", AssertionError.class);
+        checkThrows("[-1, 1, 1] * [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
+        checkThrows("[-1, 1, 1, 13] * [3.0, -1.0, 0.0]", AssertionError.class);
+        checkThrows("[] * []", AssertionError.class);
+        checkThrows("[-1, 1, 1] / [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
+        checkThrows("[-1, 1, 1, 13] / [3.0, -1.0, 0.0]", AssertionError.class);
+        checkThrows("[] / []", AssertionError.class);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
     public void testOtherBinary () {
         checkExpr("true  && true",  true);
         checkExpr("true  || true",  true);
