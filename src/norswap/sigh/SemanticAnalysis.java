@@ -514,8 +514,54 @@ public final class SemanticAnalysis
                 r.set(0, FloatType.INSTANCE);
             else
                 r.error(arithmeticError(node, "Float", right), node);
-        else
-            r.error(arithmeticError(node, left, right), node);
+        else if (right instanceof IntType)
+            if (left instanceof BoolType) {
+                r.error(arithmeticError(node, "Bool", right), node);
+            }
+
+        // Array operation semantics
+        {
+            // no operations allowed on string arrays
+            if (left instanceof ArrayType && ((ArrayType) left).componentType == StringType.INSTANCE) {
+                r.error(arithmeticError(node, "String[]", right), node);
+            }
+            if (right instanceof ArrayType && ((ArrayType) right).componentType == StringType.INSTANCE) {
+                r.error(arithmeticError(node, left, "String[]"), node);
+            }
+            // no operations allowed on bool arrays
+            if (left instanceof ArrayType && ((ArrayType) left).componentType == BoolType.INSTANCE) {
+                r.error(arithmeticError(node, "Bool[]", right), node);
+            }
+            if (right instanceof ArrayType && ((ArrayType) right).componentType == BoolType.INSTANCE) {
+                r.error(arithmeticError(node, left, "Bool[]"), node);
+            }
+            // no operations allowed on null arrays
+            if (left instanceof ArrayType && ((ArrayType) left).componentType == NullType.INSTANCE) {
+                r.error(arithmeticError(node, "Null[]", right), node);
+            }
+            if (right instanceof ArrayType && ((ArrayType) right).componentType == NullType.INSTANCE) {
+                r.error(arithmeticError(node, left, "Null[]"), node);
+            }
+        }
+
+
+        if (left instanceof ArrayType && ((ArrayType) left).componentType == IntType.INSTANCE) {
+            if (right instanceof ArrayType && ((ArrayType) right).componentType == IntType.INSTANCE) {
+                r.set(0, new ArrayType(IntType.INSTANCE));
+            } else if (right instanceof ArrayType && ((ArrayType) right).componentType == FloatType.INSTANCE) {
+                r.set(0, new ArrayType(FloatType.INSTANCE));
+            } else {
+                r.error(arithmeticError(node, "Int[]", right), node);
+            }
+        }
+        if (left instanceof ArrayType && ((ArrayType) left).componentType == FloatType.INSTANCE) {
+            if (right instanceof ArrayType && ((ArrayType) right).componentType == IntType.INSTANCE ||
+                right instanceof ArrayType && ((ArrayType) right).componentType == FloatType.INSTANCE) {
+                r.set(0, new ArrayType(FloatType.INSTANCE));
+            } else {
+                r.error(arithmeticError(node, "Float[]", right), node);
+            }
+        }
     }
 
     // ---------------------------------------------------------------------------------------------

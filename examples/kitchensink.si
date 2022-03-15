@@ -1,4 +1,4 @@
-// This file showcases every single syntactic feature in the language.
+    // This file showcases every single syntactic feature in the language.
 
 fun array_add (a: Int[]): Int
 {
@@ -56,10 +56,28 @@ fun sum_pair (pair: Pair): Int {
     return pair.a + pair.b
 }
 
+fun debugPasFun (): Int {
+     var x: Int = 1; return x
+}
+
 validate5(sum_pair($Pair(2, 3)))
 
 fun use_array (array: Int[]) {}
 
-var intArray: Int[] = []
-var stringArray: String[] = []
+var intVar1: Int = 3
+var intVar2: Int = 5
+var intVar3: Int = intVar1 + intVar2
+print("intVar3 : " + intVar3)
+
+var intArray: Int[] = [1, 2, 7]
+var intArray1: Int[] = [8, 5, 7]
+var intArray2: Int[] = []
+var result: Int = intArray[0]
+print("intArray[0] = " + result)
+var c: Float[] = [3.2, -1.3658, 0.0] / [0.0, 1.753, -1.654]
+print("c[0] = " + c[0])
+print("c[1] = " + c[1])
+print("c[2] = " + c[2])
 use_array([])
+
+print("the x in question : " + debugPasFun())

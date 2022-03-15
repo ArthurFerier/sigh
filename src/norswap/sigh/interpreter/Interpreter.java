@@ -5,6 +5,7 @@ import norswap.sigh.scopes.DeclarationKind;
 import norswap.sigh.scopes.RootScope;
 import norswap.sigh.scopes.Scope;
 import norswap.sigh.scopes.SyntheticDeclarationNode;
+import norswap.sigh.types.ArrayType;
 import norswap.sigh.types.FloatType;
 import norswap.sigh.types.IntType;
 import norswap.sigh.types.StringType;
@@ -173,14 +174,27 @@ public final class Interpreter
         Object right = get(node.right);
 
         if (node.operator == BinaryOperator.ADD
-                && (leftType instanceof StringType || rightType instanceof StringType))
+            && (leftType instanceof StringType || rightType instanceof StringType))
             return convertToString(left) + convertToString(right);
 
         boolean floating = leftType instanceof FloatType || rightType instanceof FloatType;
         boolean numeric  = floating || leftType instanceof IntType;
+        boolean array = leftType instanceof ArrayType && rightType instanceof ArrayType;
+        boolean arrayOfFloatLeft = leftType instanceof ArrayType
+            && (((ArrayType) leftType).componentType == FloatType.INSTANCE);
+        boolean arrayOfFloatRight = rightType instanceof ArrayType
+            && (((ArrayType) rightType).componentType == FloatType.INSTANCE);
 
         if (numeric)
             return numericOp(node, floating, (Number) left, (Number) right);
+        if (array &&
+            (node.operator == BinaryOperator.ADD
+                || node.operator == BinaryOperator.SUBTRACT
+                || node.operator == BinaryOperator.MULTIPLY
+                || node.operator == BinaryOperator.DIVIDE)) {
+            System.out.println("arrays content : " + node.contents());
+            return arrayOp(node, arrayOfFloatLeft, arrayOfFloatRight);
+        }
 
         switch (node.operator) {
             case EQUALITY:
@@ -253,6 +267,166 @@ public final class Interpreter
                 default:
                     throw new Error("should not reach here");
             }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    public Object arrayOp (BinaryExpressionNode node, boolean floatingLeft, boolean floatingRight) {
+        Object[] ar1 =  getNonNullArray(node.left);
+        Object[] ar2 =  getNonNullArray(node.right);
+
+        // verifying that the 2 arrays have the same length
+        if (ar1.length != ar2.length) {
+            throw new ArrayIndexOutOfBoundsException("The two arrays must have the same length");
+        }
+
+        // left array of double and right arrays of long
+        if (floatingLeft && !floatingRight) {
+            Double[] ar1Double = new Double[ar1.length];
+            Long[] ar2Long = new Long[ar2.length];
+            for (int i = 0; i < ar1.length; i++) {
+                ar1Double[i] = (Double) ar1[i];
+                ar2Long[i] = (Long) ar2[i];
+            }
+            Double[] result = new Double[ar1.length];
+
+            switch (node.operator) {
+                case ADD:          {
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Double[i] + ar2Long[i];
+                    }
+                    return result;
+                }
+                case SUBTRACT:
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Double[i] - ar2Long[i];
+                    }
+                    return result;
+                case MULTIPLY:
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Double[i] * ar2Long[i];
+                    }
+                    return result;
+                case DIVIDE:
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Double[i] / ar2Long[i];
+                    }
+                    return result;
+                default:
+                    throw new Error("should not reach here");
+            }
+        }
+        // left array of long and right arrays of double
+        else if (!floatingLeft && floatingRight) {
+            Long[] ar1long = new Long[ar1.length];
+            Double[] ar2Double = new Double[ar2.length];
+            for (int i = 0; i < ar1.length; i++) {
+                ar1long[i] = (Long) ar1[i];
+                ar2Double[i] = (Double) ar2[i];
+            }
+            Double[] result = new Double[ar1.length];
+
+            switch (node.operator) {
+                case ADD:          {
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1long[i] + ar2Double[i];
+                    }
+                    return result;
+                }
+                case SUBTRACT:
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1long[i] - ar2Double[i];
+                    }
+                    return result;
+                case MULTIPLY:
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1long[i] * ar2Double[i];
+                    }
+                    return result;
+                case DIVIDE:
+                    for (int i = 0; i < result.length; i++) {
+                        System.out.print("at "+ i);
+                        System.out.print(", left : " + ar1long[i].toString());
+                        System.out.println(", right : " + ar2Double[i].toString());
+                        result[i] = ar1long[i] / ar2Double[i];
+                    }
+                    return result;
+                default:
+                    throw new Error("should not reach here");
+            }
+        }
+        // two arrays of double
+        else if (floatingLeft && floatingRight) {
+            Double[] ar1Double = new Double[ar1.length];
+            Double[] ar2Double = new Double[ar2.length];
+            for (int i = 0; i < ar1.length; i++) {
+                ar1Double[i] = (Double) ar1[i];
+                ar2Double[i] = (Double) ar2[i];
+            }
+            Double[] result = new Double[ar1.length];
+
+            switch (node.operator) {
+                case ADD:          {
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Double[i] + ar2Double[i];
+                    }
+                    return result;
+                }
+                case SUBTRACT:
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Double[i] - ar2Double[i];
+                    }
+                    return result;
+                case MULTIPLY:
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Double[i] * ar2Double[i];
+                    }
+                    return result;
+                case DIVIDE:
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Double[i] / ar2Double[i];
+                    }
+                    return result;
+                default:
+                    throw new Error("should not reach here");
+            }
+        }
+        // two arrays of long
+        else {
+            Long[] ar1Long = new Long[ar1.length];
+            Long[] ar2Long = new Long[ar2.length];
+            for (int i = 0; i < ar1.length; i++) {
+                ar1Long[i] = (Long) ar1[i];
+                ar2Long[i] = (Long) ar2[i];
+            }
+            Long[] result = new Long[ar1.length];
+
+            switch (node.operator) {
+                case ADD:          {
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Long[i] + ar2Long[i];
+                    }
+                    return result;
+                }
+                case SUBTRACT:
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Long[i] - ar2Long[i];
+                    }
+                    return result;
+                case MULTIPLY:
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Long[i] * ar2Long[i];
+                    }
+                    return result;
+                case DIVIDE:
+                    for (int i = 0; i < result.length; i++) {
+                        result[i] = ar1Long[i] / ar2Long[i];
+                    }
+                    return result;
+                default:
+                    throw new Error("should not reach here");
+            }
+        }
     }
 
     // ---------------------------------------------------------------------------------------------
