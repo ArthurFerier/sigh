@@ -195,6 +195,60 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
 
     // ---------------------------------------------------------------------------------------------
 
+    @Test public void testNumericArrayOperationMultipleDim() {
+        // multi dim with int left and float right
+        successInput("return [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]");
+        successInput("return [[-1, 1, 0], [15, -36, 789]] - [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]");
+        successInput("return [[-1, 1, 0], [15, -36, 789]] * [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]");
+        successInput("return [[-1, 1, 0], [15, -36, 789]] / [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]");
+        // multi dim with int right and float left
+        successInput("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] + [[-1, 1, 0], [15, -36, 789]]");
+        successInput("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] - [[-1, 1, 0], [15, -36, 789]]");
+        successInput("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] * [[-1, 1, 0], [15, -36, 789]]");
+        successInput("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] / [[-1, 1, 0], [15, -36, 789]]");
+        // big multi dim
+        successInput("return [[[[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]]] / [[[[-1, 1, 0], [15, -36, 789]]]]");
+
+        // failures
+        failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to add String[] with Float[]");
+        failureInputWith("return [1, 2] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to add Int[] with Float[][]");
+        failureInputWith("return [1.0, 2.0] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to add Float[] with Float[][]");
+        failureInputWith("return [1.0, 2.6] + [[3, -1, 0], [1, 2, 3]]",
+            "Trying to add Float[] with Int[][]");
+
+        failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] - [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to subtract String[] with Float[]");
+        failureInputWith("return [1, 2] - [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to subtract Int[] with Float[][]");
+        failureInputWith("return [1.0, 2.0] - [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to subtract Float[] with Float[][]");
+        failureInputWith("return [1.0, 2.6] - [[3, -1, 0], [1, 2, 3]]",
+            "Trying to subtract Float[] with Int[][]");
+
+        failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] * [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to multiply String[] with Float[]");
+        failureInputWith("return [1, 2] * [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to multiply Int[] with Float[][]");
+        failureInputWith("return [1.0, 2.0] * [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to multiply Float[] with Float[][]");
+        failureInputWith("return [1.0, 2.6] * [[3, -1, 0], [1, 2, 3]]",
+            "Trying to multiply Float[] with Int[][]");
+
+        failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] / [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to divide String[] with Float[]");
+        failureInputWith("return [1, 2] / [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to divide Int[] with Float[][]");
+        failureInputWith("return [1.0, 2.0] / [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "Trying to divide Float[] with Float[][]");
+        failureInputWith("return [1.0, 2.6] / [[3, -1, 0], [1, 2, 3]]",
+            "Trying to divide Float[] with Int[][]");
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
     @Test public void testOtherBinary() {
         successInput("return true && false");
         successInput("return false && true");
