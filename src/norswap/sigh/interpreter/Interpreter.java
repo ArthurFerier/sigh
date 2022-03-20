@@ -180,10 +180,7 @@ public final class Interpreter
         boolean floating = leftType instanceof FloatType || rightType instanceof FloatType;
         boolean numeric  = floating || leftType instanceof IntType;
         boolean array = leftType instanceof ArrayType && rightType instanceof ArrayType;
-        boolean arrayOfFloatLeft = leftType instanceof ArrayType
-            && (((ArrayType) leftType).componentType == FloatType.INSTANCE);
-        boolean arrayOfFloatRight = rightType instanceof ArrayType
-            && (((ArrayType) rightType).componentType == FloatType.INSTANCE);
+
 
         if (numeric)
             return numericOp(node, floating, (Number) left, (Number) right);
@@ -192,7 +189,17 @@ public final class Interpreter
                 || node.operator == BinaryOperator.SUBTRACT
                 || node.operator == BinaryOperator.MULTIPLY
                 || node.operator == BinaryOperator.DIVIDE)) {
-            System.out.println("arrays content : " + node.contents());
+
+            // diving into the multi dimension to find the type of the array
+            while ((((ArrayType) leftType).componentType instanceof ArrayType)) {
+                leftType = ((ArrayType) leftType).componentType;
+            }
+            while ((((ArrayType) rightType).componentType instanceof ArrayType)) {
+                rightType = ((ArrayType) rightType).componentType;
+            }
+            boolean arrayOfFloatLeft = (((ArrayType) leftType).componentType == FloatType.INSTANCE);
+            boolean arrayOfFloatRight = (((ArrayType) rightType).componentType == FloatType.INSTANCE);
+
             return arrayOp(node, arrayOfFloatLeft, arrayOfFloatRight);
         }
 
