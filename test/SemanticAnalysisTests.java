@@ -210,6 +210,7 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         successInput("return [[[[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]]] / [[[[-1, 1, 0], [15, -36, 789]]]]");
 
         // failures
+        // add
         failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
             "Trying to add String[] with Float[]");
         failureInputWith("return [1, 2] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
@@ -219,6 +220,16 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         failureInputWith("return [1.0, 2.6] + [[3, -1, 0], [1, 2, 3]]",
             "Trying to add Float[] with Int[][]");
 
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] + [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]]",
+            "Trying to add Float[] with String[]");
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] + [1, 2]",
+            "Trying to add Array[] with Int[]");
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] + [1.0, 2.0]",
+            "Trying to add Array[] with Float[]");
+        failureInputWith("return [[3, -1, 0], [1, 2, 3]] + [1.0, 2.6]",
+            "Trying to add Array[] with Float[]");
+
+        // subtract
         failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] - [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
             "Trying to subtract String[] with Float[]");
         failureInputWith("return [1, 2] - [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
@@ -228,6 +239,16 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         failureInputWith("return [1.0, 2.6] - [[3, -1, 0], [1, 2, 3]]",
             "Trying to subtract Float[] with Int[][]");
 
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] - [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]]",
+            "Trying to subtract Float[] with String[]");
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] - [1, 2]",
+            "Trying to subtract Array[] with Int[]");
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] - [1.0, 2.0]",
+            "Trying to subtract Array[] with Float[]");
+        failureInputWith("return [[3, -1, 0], [1, 2, 3]] - [1.0, 2.6]",
+            "Trying to subtract Array[] with Float[]");
+
+        // multiply
         failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] * [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
             "Trying to multiply String[] with Float[]");
         failureInputWith("return [1, 2] * [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
@@ -237,6 +258,16 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         failureInputWith("return [1.0, 2.6] * [[3, -1, 0], [1, 2, 3]]",
             "Trying to multiply Float[] with Int[][]");
 
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] * [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]]",
+            "Trying to multiply Float[] with String[]");
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] * [1, 2]",
+            "Trying to multiply Array[] with Int[]");
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] * [1.0, 2.0]",
+            "Trying to multiply Array[] with Float[]");
+        failureInputWith("return [[3, -1, 0], [1, 2, 3]] * [1.0, 2.6]",
+            "Trying to multiply Array[] with Float[]");
+
+        // divide
         failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] / [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
             "Trying to divide String[] with Float[]");
         failureInputWith("return [1, 2] / [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
@@ -245,6 +276,15 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
             "Trying to divide Float[] with Float[][]");
         failureInputWith("return [1.0, 2.6] / [[3, -1, 0], [1, 2, 3]]",
             "Trying to divide Float[] with Int[][]");
+
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] / [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]]",
+            "Trying to divide Float[] with String[]");
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] / [1, 2]",
+            "Trying to divide Array[] with Int[]");
+        failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] / [1.0, 2.0]",
+            "Trying to divide Array[] with Float[]");
+        failureInputWith("return [[3, -1, 0], [1, 2, 3]] / [1.0, 2.6]",
+            "Trying to divide Array[] with Float[]");
     }
 
     // ---------------------------------------------------------------------------------------------
