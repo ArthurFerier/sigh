@@ -15,7 +15,7 @@ import norswap.utils.Util;
 import norswap.utils.exceptions.Exceptions;
 import norswap.utils.exceptions.NoStackException;
 import norswap.utils.visitors.ValuedVisitor;
-import org.graalvm.compiler.graph.spi.Canonicalizable.Binary;
+//import org.graalvm.compiler.graph.spi.Canonicalizable.Binary;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -185,11 +185,7 @@ public final class Interpreter
 
         if (numeric)
             return numericOp(node, floating, (Number) left, (Number) right);
-        if (array &&
-            (node.operator == BinaryOperator.ADD
-                || node.operator == BinaryOperator.SUBTRACT
-                || node.operator == BinaryOperator.MULTIPLY
-                || node.operator == BinaryOperator.DIVIDE)) {
+        if (array) {
 
             // diving into the multi dimension to find the type of the array
             while ((((ArrayType) leftType).componentType instanceof ArrayType)) {
@@ -205,7 +201,7 @@ public final class Interpreter
             Object[] noderight =  getNonNullArray(node.right);
 
 
-            return arrayOp2(node);
+            return arrayOp(node);
         }
 
         switch (node.operator) {
@@ -284,7 +280,7 @@ public final class Interpreter
     // ---------------------------------------------------------------------------------------------
 
 
-    public Object arrayOp2 (BinaryExpressionNode node) {
+    public Object arrayOp (BinaryExpressionNode node) {
         Object[] ar1 = getNonNullArray(node.left);
         Object[] ar2 = getNonNullArray(node.right);
         return computeArrayExpression(ar1, ar2, node.operator);
@@ -304,155 +300,129 @@ public final class Interpreter
             return res;
         }
 
-        else if (ar1[0] instanceof Double && ar2[0] instanceof Double) {
-            Double[] resultD = new Double[ar1.length];
-            switch (operator) {
-                case ADD:
-                    for (int i = 0; i < ar1.length; i++) {
-                        resultD[i] = (Double) ar1[i] + ((Number) ar2[i]).doubleValue();
-                    }
-                    return resultD;
-                case SUBTRACT:
-                    for (int i = 0; i < resultD.length; i++) {
-                        resultD[i] = (Double) ar1[i] - ((Number) ar2[i]).doubleValue();
-                    }
-                    return resultD;
-                case MULTIPLY:
-                    for (int i = 0; i < resultD.length; i++) {
-                        resultD[i] = (Double) ar1[i] * ((Number) ar2[i]).doubleValue();
-                    }
-                    return resultD;
-
-            }
-        }
-
-        else if (ar1[0] instanceof Long && ar2[0] instanceof Long) {
-            Long[] resultL = new Long[ar1.length];
-            switch (operator) {
-                case ADD:
-                    for (int i = 0; i < ar1.length; i++) {
-                        resultL[i] = (Long) ar1[i] + ((Number) ar2[i]).longValue();
-                    }
-                    return resultL;
-                case SUBTRACT:
-                    for (int i = 0; i < resultL.length; i++) {
-                        resultL[i] = (Long) ar1[i] - ((Number) ar2[i]).longValue();
-                    }
-                    return resultL;
-                case MULTIPLY:
-                    for (int i = 0; i < resultL.length; i++) {
-                        resultL[i] = (Long) ar1[i] * ((Number) ar2[i]).longValue();
-                    }
-                    return resultL;
-
-            }
-        }
-
-        throw new Error("Should not reach here");
-    }
-
-
-    public Object arrayOp (Object[] nodeLeft, Object[] nodeRight, BinaryOperator nodeOperator,
-        boolean floatingLeft, boolean floatingRight) {
-        /*
-        Object[] ar1 =  getNonNullArray(node.left);
-        Object[] ar2 =  getNonNullArray(node.right);
-
-        // verifying that the 2 arrays have the same length
-        if (ar1.length != ar2.length) {
-            throw new ArrayIndexOutOfBoundsException("The two arrays must have the same length");
-        }*/
-
-        return new Object();
-
-
-    }
-
-    /*public Object arrayOp1D(BinaryOperator nodeOperator, boolean floatingLeft, boolean floatingRight) {
-        Double[] resultD = new Double[ar1.length];
-        Long[] resultL = new Long[ar1.length];
-
-        switch (nodeOperator) {
+        boolean floatLeft = ar1[0] instanceof Double;
+        boolean floatRight = ar2[0] instanceof Double;
+        switch (operator) {
             case ADD:
-                if (floatingLeft) {
-                    for (int i = 0; i < resultD.length; i++) {
-                        resultD[i] = (Double) ar1[i] + ((Number) ar2[i]).doubleValue();
+                if (floatLeft || floatRight) {
+                    Double[] resultD = new Double[ar1.length];
+                    if (floatLeft && floatRight) {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = (Double) ar1[i] + (Double) ar2[i];
+                        }
+                        return resultD;
                     }
-                    return resultD;
-                }
-                if (floatingRight) {
-                    for (int i = 0; i < resultD.length; i++) {
-                        resultD[i] = ((Number) ar1[i]).doubleValue() + (Double) ar2[i];
+                    else if (floatRight) {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = (Double) ar2[i] + ((Number) ar1[i]).doubleValue();
+                        }
+                        return resultD;
                     }
-                    return resultD;
+                    else {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = (Double) ar1[i] + ((Number) ar2[i]).doubleValue();
+                        }
+                        return resultD;
+                    }
                 }
-                else {
-                    for (int i = 0; i < resultL.length; i++) {
+                else if (ar1[0] instanceof Long && ar2[0] instanceof Long) {
+                    Long[] resultL = new Long[ar1.length];
+                    for (int i = 0; i < ar1.length; i++) {
                         resultL[i] = (Long) ar1[i] + (Long) ar2[i];
                     }
                     return resultL;
                 }
             case SUBTRACT:
-                if (floatingLeft) {
-                    for (int i = 0; i < resultD.length; i++) {
-                        resultD[i] = (Double) ar1[i] - ((Number) ar2[i]).doubleValue();
+                if (floatLeft || floatRight) {
+                    Double[] resultD = new Double[ar1.length];
+                    if (floatLeft && floatRight) {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = (Double) ar1[i] - (Double) ar2[i];
+                        }
+                        return resultD;
                     }
-                    return resultD;
-                }
-                if (floatingRight) {
-                    for (int i = 0; i < resultD.length; i++) {
-                        resultD[i] = ((Number) ar1[i]).doubleValue() - (Double) ar2[i];
+                    else if (floatRight) {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = ((Number) ar1[i]).doubleValue() - (Double) ar2[i];
+                        }
+                        return resultD;
                     }
-                    return resultD;
+                    else {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = (Double) ar1[i] - ((Number) ar2[i]).doubleValue();
+                        }
+                        return resultD;
+                    }
                 }
-                else {
-                    for (int i = 0; i < resultL.length; i++) {
+                else if (ar1[0] instanceof Long && ar2[0] instanceof Long) {
+                    Long[] resultL = new Long[ar1.length];
+                    for (int i = 0; i < ar1.length; i++) {
                         resultL[i] = (Long) ar1[i] - (Long) ar2[i];
                     }
                     return resultL;
                 }
             case MULTIPLY:
-                if (floatingLeft) {
-                    for (int i = 0; i < resultD.length; i++) {
-                        resultD[i] = (Double) ar1[i] * ((Number) ar2[i]).doubleValue();
+                if (floatLeft || floatRight) {
+                    Double[] resultD = new Double[ar1.length];
+                    if (floatLeft && floatRight) {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = (Double) ar1[i] * (Double) ar2[i];
+                        }
+                        return resultD;
                     }
-                    return resultD;
-                }
-                if (floatingRight) {
-                    for (int i = 0; i < resultD.length; i++) {
-                        resultD[i] = ((Number) ar1[i]).doubleValue() * (Double) ar2[i];
+                    else if (floatRight) {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = (Double) ar2[i] * ((Number) ar1[i]).doubleValue();
+                        }
+                        return resultD;
                     }
-                    return resultD;
+                    else {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = (Double) ar1[i] * ((Number) ar2[i]).doubleValue();
+                        }
+                        return resultD;
+                    }
                 }
-                else {
-                    for (int i = 0; i < resultL.length; i++) {
+                else if (ar1[0] instanceof Long && ar2[0] instanceof Long) {
+                    Long[] resultL = new Long[ar1.length];
+                    for (int i = 0; i < ar1.length; i++) {
                         resultL[i] = (Long) ar1[i] * (Long) ar2[i];
                     }
                     return resultL;
                 }
             case DIVIDE:
-                if (floatingLeft) {
-                    for (int i = 0; i < resultD.length; i++) {
-                        resultD[i] = (Double) ar1[i] / ((Number) ar2[i]).doubleValue();
+                if (floatLeft || floatRight) {
+                    Double[] resultD = new Double[ar1.length];
+                    if (floatLeft && floatRight) {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = (Double) ar1[i] / (Double) ar2[i];
+                        }
+                        return resultD;
                     }
-                    return resultD;
-                }
-                if (floatingRight) {
-                    for (int i = 0; i < resultD.length; i++) {
-                        resultD[i] = ((Number) ar1[i]).doubleValue() / (Double) ar2[i];
+                    else if (floatRight) {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = ((Number) ar1[i]).doubleValue() / (Double) ar2[i];
+                        }
+                        return resultD;
                     }
-                    return resultD;
+                    else {
+                        for (int i = 0; i < ar1.length; i++) {
+                            resultD[i] = (Double) ar1[i] / ((Number) ar2[i]).doubleValue();
+                        }
+                        return resultD;
+                    }
                 }
-                else {
-                    for (int i = 0; i < resultL.length; i++) {
+                else if (ar1[0] instanceof Long && ar2[0] instanceof Long) {
+                    Long[] resultL = new Long[ar1.length];
+                    for (int i = 0; i < ar1.length; i++) {
                         resultL[i] = (Long) ar1[i] / (Long) ar2[i];
                     }
                     return resultL;
                 }
-            default:
-                throw new Error("should not reach here");
+            default: throw new Error("Operand not supported, use among : + ; - ; * ; / or types of array1 and array2 are different from :" +
+                "Float - Integer / Integer - Float / Float - Float / Integer - Integer");
         }
-    }*/
+    }
 
     // ---------------------------------------------------------------------------------------------
 
