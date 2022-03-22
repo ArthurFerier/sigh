@@ -15,6 +15,7 @@ import norswap.utils.Util;
 import norswap.utils.exceptions.Exceptions;
 import norswap.utils.exceptions.NoStackException;
 import norswap.utils.visitors.ValuedVisitor;
+import org.graalvm.compiler.graph.spi.Canonicalizable.Binary;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -180,10 +181,7 @@ public final class Interpreter
         boolean floating = leftType instanceof FloatType || rightType instanceof FloatType;
         boolean numeric  = floating || leftType instanceof IntType;
         boolean array = leftType instanceof ArrayType && rightType instanceof ArrayType;
-        boolean arrayOfFloatLeft = leftType instanceof ArrayType
-            && (((ArrayType) leftType).componentType == FloatType.INSTANCE);
-        boolean arrayOfFloatRight = rightType instanceof ArrayType
-            && (((ArrayType) rightType).componentType == FloatType.INSTANCE);
+
 
         if (numeric)
             return numericOp(node, floating, (Number) left, (Number) right);
@@ -192,8 +190,22 @@ public final class Interpreter
                 || node.operator == BinaryOperator.SUBTRACT
                 || node.operator == BinaryOperator.MULTIPLY
                 || node.operator == BinaryOperator.DIVIDE)) {
-            System.out.println("arrays content : " + node.contents());
-            return arrayOp(node, arrayOfFloatLeft, arrayOfFloatRight);
+
+            // diving into the multi dimension to find the type of the array
+            while ((((ArrayType) leftType).componentType instanceof ArrayType)) {
+                leftType = ((ArrayType) leftType).componentType;
+            }
+            while ((((ArrayType) rightType).componentType instanceof ArrayType)) {
+                rightType = ((ArrayType) rightType).componentType;
+            }
+            boolean arrayOfFloatLeft = (((ArrayType) leftType).componentType == FloatType.INSTANCE);
+            boolean arrayOfFloatRight = (((ArrayType) rightType).componentType == FloatType.INSTANCE);
+
+            Object[] nodeLeft = getNonNullArray(node.left);
+            Object[] noderight =  getNonNullArray(node.right);
+
+
+            return arrayOp2(node);
         }
 
         switch (node.operator) {
@@ -271,19 +283,96 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
-    public Object arrayOp (BinaryExpressionNode node, boolean floatingLeft, boolean floatingRight) {
+
+    public Object arrayOp2 (BinaryExpressionNode node) {
+        Object[] ar1 = getNonNullArray(node.left);
+        Object[] ar2 = getNonNullArray(node.right);
+        return computeArrayExpression(ar1, ar2, node.operator);
+    }
+
+    public Object computeArrayExpression(Object[] ar1, Object[] ar2, BinaryOperator operator) {
+        // verifying that the 2 arrays have the same length
+        if (ar1.length != ar2.length) {
+            throw new ArrayIndexOutOfBoundsException("The two arrays must have the same length");
+        }
+
+        Object[] res = new Object[ar1.length];
+        if (ar1[0].getClass().isArray() && ar2[0].getClass().isArray()) {
+            for (int i = 0; i < ar1.length; i++) {
+                res[i] = computeArrayExpression((Object[]) ar1[i], (Object[]) ar2[i], operator);
+            }
+            return res;
+        }
+
+        else if (ar1[0] instanceof Double && ar2[0] instanceof Double) {
+            Double[] resultD = new Double[ar1.length];
+            switch (operator) {
+                case ADD:
+                    for (int i = 0; i < ar1.length; i++) {
+                        resultD[i] = (Double) ar1[i] + ((Number) ar2[i]).doubleValue();
+                    }
+                    return resultD;
+                case SUBTRACT:
+                    for (int i = 0; i < resultD.length; i++) {
+                        resultD[i] = (Double) ar1[i] - ((Number) ar2[i]).doubleValue();
+                    }
+                    return resultD;
+                case MULTIPLY:
+                    for (int i = 0; i < resultD.length; i++) {
+                        resultD[i] = (Double) ar1[i] * ((Number) ar2[i]).doubleValue();
+                    }
+                    return resultD;
+
+            }
+        }
+
+        else if (ar1[0] instanceof Long && ar2[0] instanceof Long) {
+            Long[] resultL = new Long[ar1.length];
+            switch (operator) {
+                case ADD:
+                    for (int i = 0; i < ar1.length; i++) {
+                        resultL[i] = (Long) ar1[i] + ((Number) ar2[i]).longValue();
+                    }
+                    return resultL;
+                case SUBTRACT:
+                    for (int i = 0; i < resultL.length; i++) {
+                        resultL[i] = (Long) ar1[i] - ((Number) ar2[i]).longValue();
+                    }
+                    return resultL;
+                case MULTIPLY:
+                    for (int i = 0; i < resultL.length; i++) {
+                        resultL[i] = (Long) ar1[i] * ((Number) ar2[i]).longValue();
+                    }
+                    return resultL;
+
+            }
+        }
+
+        throw new Error("Should not reach here");
+    }
+
+
+    public Object arrayOp (Object[] nodeLeft, Object[] nodeRight, BinaryOperator nodeOperator,
+        boolean floatingLeft, boolean floatingRight) {
+        /*
         Object[] ar1 =  getNonNullArray(node.left);
         Object[] ar2 =  getNonNullArray(node.right);
 
         // verifying that the 2 arrays have the same length
         if (ar1.length != ar2.length) {
             throw new ArrayIndexOutOfBoundsException("The two arrays must have the same length");
-        }
+        }*/
 
+        return new Object();
+
+
+    }
+
+    /*public Object arrayOp1D(BinaryOperator nodeOperator, boolean floatingLeft, boolean floatingRight) {
         Double[] resultD = new Double[ar1.length];
         Long[] resultL = new Long[ar1.length];
 
-        switch (node.operator) {
+        switch (nodeOperator) {
             case ADD:
                 if (floatingLeft) {
                     for (int i = 0; i < resultD.length; i++) {
@@ -363,7 +452,7 @@ public final class Interpreter
             default:
                 throw new Error("should not reach here");
         }
-    }
+    }*/
 
     // ---------------------------------------------------------------------------------------------
 
