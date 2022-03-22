@@ -14,7 +14,8 @@ public enum BinaryOperator
     GREATER_EQUAL(">="),
     LOWER_EQUAL("<="),
     AND("&&"),
-    OR("||");
+    OR("||"),
+    MAT_PRODUCT("@"); // Matricial product
 
     public final String string;
 
