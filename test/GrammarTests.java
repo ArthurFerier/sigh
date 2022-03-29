@@ -137,5 +137,12 @@ public class GrammarTests extends AutumnTestFixture {
             new BlockNode(null, asList(new ReturnNode(null, null)))));
     }
 
+    @Test public void testLaunch() {
+        rule = grammar.statement;
+
+        successExpect("launch print(1)", new ExpressionStatementNode(null,
+            new LaunchNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))));
+    }
+
     // ---------------------------------------------------------------------------------------------
 }
