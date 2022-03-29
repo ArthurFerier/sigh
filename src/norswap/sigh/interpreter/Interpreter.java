@@ -201,8 +201,9 @@ public final class Interpreter
             Object[] nodeLeft = getNonNullArray(node.left);
             Object[] noderight =  getNonNullArray(node.right);
 
-
-            return arrayOp(node);
+            if (node.operator == BinaryOperator.MULTIPLY || node.operator == BinaryOperator.DIVIDE ||
+                node.operator == BinaryOperator.ADD || node.operator == BinaryOperator.SUBTRACT)
+                return arrayOp(node);
         }
 
         switch (node.operator) {
@@ -337,6 +338,7 @@ public final class Interpreter
         Object[] res = new Object[ar1.length];
         if (ar1[0].getClass().isArray() && ar2[0].getClass().isArray()) {
             for (int i = 0; i < ar1.length; i++) {
+                // Recursive call to deal with multi-dimensional array
                 res[i] = computeArrayExpression((Object[]) ar1[i], (Object[]) ar2[i], operator);
             }
             return res;

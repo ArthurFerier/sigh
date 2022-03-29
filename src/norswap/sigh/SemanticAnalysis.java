@@ -572,7 +572,6 @@ public final class SemanticAnalysis
                     r.error(arithmeticError(node, "Float[]", right), node);
                 }
             }
-
             // normally : we arrive here if the two subtypes can only be ArrayType
             left = ((ArrayType) left).componentType;
             right = ((ArrayType) right).componentType;
