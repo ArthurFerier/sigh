@@ -60,6 +60,7 @@ public class SighGrammar extends Grammar
     public rule _else           = reserved("else");
     public rule _while          = reserved("while");
     public rule _return         = reserved("return");
+    public rule _launch         = reserved("launch");
 
     public rule number =
         seq(opt('-'), choice('0', digit.at_least(1)));
@@ -129,6 +130,7 @@ public class SighGrammar extends Grammar
     public rule function_args =
         seq(LPAREN, expressions, RPAREN);
 
+    // todo : add the launch expression in the suffix expression
     public rule suffix_expression = left_expression()
         .left(basic_expression)
         .suffix(seq(DOT, identifier),
@@ -137,6 +139,10 @@ public class SighGrammar extends Grammar
             $ -> new ArrayAccessNode($.span(), $.$[0], $.$[1]))
         .suffix(function_args,
             $ -> new FunCallNode($.span(), $.$[0], $.$[1]));
+
+    public rule launch_expression =
+        seq(_launch, basic_expression, function_args)
+            .push($ -> new LaunchNode($.span(), $.$[0], $.$[1]));
 
     public rule prefix_expression = right_expression()
         .operand(suffix_expression)
@@ -160,6 +166,8 @@ public class SighGrammar extends Grammar
         RANGLE_EQUAL.as_val(BinaryOperator.GREATER_EQUAL),
         LANGLE      .as_val(BinaryOperator.LOWER),
         RANGLE      .as_val(BinaryOperator.GREATER));
+
+
 
     public rule mult_expr = left_expression()
         .operand(prefix_expression)
