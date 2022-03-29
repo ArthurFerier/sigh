@@ -169,6 +169,7 @@ public final class Interpreter
         switch (node.operator) {
             case OR:  return booleanOp(node, false);
             case AND: return booleanOp(node, true);
+            case MAT_PRODUCT: return matricialProduct(node); // We treat this case apart
         }
 
         Object left  = get(node.left);
@@ -213,6 +214,7 @@ public final class Interpreter
 
         throw new Error("should not reach here");
     }
+
 
     // ---------------------------------------------------------------------------------------------
 
@@ -279,6 +281,46 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
+    // TODO matricial product, we have a nullPointerException
+    private Object matricialProduct (BinaryExpressionNode node) {
+        Object[] ar1 = getNonNullArray(node.left);
+        Object[] ar2 = getNonNullArray(node.right);
+        Object[] first1 = (Object[]) ar1[0];
+        Object[] first2 = (Object[]) ar2[0];
+        if (ar1.length != first2.length)
+            throw new Error("Number of lines of array1 : " + ar1.length + " is different of number of columns of array2 : " + first2.length);
+
+        Object[][] ar2DA = new Object[ar1.length][first1.length];
+        Object[][] ar2DB = new Object[ar2.length][first2.length];
+        for (int i = 0; i < ar1.length; i++) {
+            ar2DA[i] = (Object[]) ar1[i];
+        }
+        for (int i = 0; i < ar2.length; i++) {
+            ar2DB[i] = (Object[]) ar2[i];
+        }
+        return multiplyMatrices(ar2DA, ar2DB);
+    }
+
+    private Double[][] multiplyMatrices(Object[][] firstMatrix, Object[][] secondMatrix) {
+        Double[][] result = new Double[firstMatrix.length][secondMatrix[0].length];
+        Object o = firstMatrix[0][0];
+
+        for (int row = 0; row < result.length; row++) {
+            for (int col = 0; col < result[row].length; col++) {
+                result[row][col] = multiplyMatricesCell(firstMatrix, secondMatrix, row, col);
+            }
+        }
+
+        return result;
+    }
+
+    private Double multiplyMatricesCell(Object[][] firstMatrix, Object[][] secondMatrix, int row, int col) {
+        Double cell = 0.0;
+        for (int i = 0; i < secondMatrix.length; i++) {
+            cell += (Double) firstMatrix[row][i] * (Double) secondMatrix[i][col];
+        }
+        return cell;
+    }
 
     public Object arrayOp (BinaryExpressionNode node) {
         Object[] ar1 = getNonNullArray(node.left);
@@ -286,10 +328,10 @@ public final class Interpreter
         return computeArrayExpression(ar1, ar2, node.operator);
     }
 
-    public Object computeArrayExpression(Object[] ar1, Object[] ar2, BinaryOperator operator) {
+    private Object computeArrayExpression(Object[] ar1, Object[] ar2, BinaryOperator operator) {
         // verifying that the 2 arrays have the same length
         if (ar1.length != ar2.length) {
-            throw new ArrayIndexOutOfBoundsException("The two arrays must have the same length");
+            throw new Error("The two arrays must have the same length");
         }
 
         Object[] res = new Object[ar1.length];

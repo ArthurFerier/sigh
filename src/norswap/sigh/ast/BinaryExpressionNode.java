@@ -19,7 +19,6 @@ public final class BinaryExpressionNode extends ExpressionNode
     {
         String candidate = String.format("%s %s %s",
             left.contents(), operator.string, right.contents());
-
         return candidate.length() <= contentsBudget()
             ? candidate
             : String.format("(?) %s (?)", operator.string);
