@@ -130,7 +130,6 @@ public class SighGrammar extends Grammar
     public rule function_args =
         seq(LPAREN, expressions, RPAREN);
 
-    // todo : add the launch expression in the suffix expression
     public rule suffix_expression = left_expression()
         .left(basic_expression)
         .suffix(seq(DOT, identifier),
@@ -140,9 +139,10 @@ public class SighGrammar extends Grammar
         .suffix(function_args,
             $ -> new FunCallNode($.span(), $.$[0], $.$[1]));
 
+    /*
     public rule launch_expression =
         seq(_launch, basic_expression, function_args)
-            .push($ -> new LaunchNode($.span(), $.$[0], $.$[1]));
+            .push($ -> new LaunchNode($.span(), $.$[0], $.$[1]));*/
 
     public rule prefix_expression = right_expression()
         .operand(suffix_expression)
@@ -154,6 +154,8 @@ public class SighGrammar extends Grammar
         SLASH       .as_val(BinaryOperator.DIVIDE),
         AT          .as_val(BinaryOperator.MAT_PRODUCT),
         PERCENT     .as_val(BinaryOperator.REMAINDER));
+
+    public rule launch_op = _launch.as_val(LaunchOperator.LAUNCH);
 
     public rule add_op = choice(
         PLUS        .as_val(BinaryOperator.ADD),
@@ -168,6 +170,10 @@ public class SighGrammar extends Grammar
         RANGLE      .as_val(BinaryOperator.GREATER));
 
 
+    // todo : besoin d'un argument à infix ?
+    public rule launch_expr = left_expression()
+        .operand(prefix_expression)
+        .infix(launch_op);
 
     public rule mult_expr = left_expression()
         .operand(prefix_expression)
@@ -194,8 +200,12 @@ public class SighGrammar extends Grammar
         .infix(BAR_BAR.as_val(BinaryOperator.OR),
             $ -> new BinaryExpressionNode($.span(), $.$[0], $.$[1], $.$[2]));
 
+    // todo problem here
     public rule assignment_expression = right_expression()
-        .operand(or_expression)
+        .operand(
+            or_expression
+        )
+        .infix(_launch) // public rule _launch = reserved("launch");
         .infix(EQUALS,
             $ -> new AssignmentNode($.span(), $.$[0], $.$[1]));
 
