@@ -2,23 +2,22 @@ package norswap.sigh.ast;
 
 import norswap.autumn.positions.Span;
 import norswap.utils.Util;
-import java.util.List;
 
-public class LaunchNode extends ExpressionNode
+public final class LaunchNode extends ExpressionNode
 {
-    public final ExpressionNode function;
-    public final List<ExpressionNode> arguments;
 
-    @SuppressWarnings("unchecked")
-    public LaunchNode (Span span, Object function, Object arguments) {
+    Span span;
+    public final FunCallNode funCall;
+
+    public LaunchNode (Span span, Object arguments) {
         super(span);
-        this.function = Util.cast(function, ExpressionNode.class);
-        this.arguments = Util.cast(arguments, List.class);
+        this.span = span;
+        this.funCall = Util.cast(arguments, FunCallNode.class);
     }
 
-    @Override public String contents ()
+    @Override
+    public String contents ()
     {
-        String args = arguments.size() == 0 ? "()" : "(...)";
-        return function.contents() + args;
+        return funCall.contents();
     }
 }

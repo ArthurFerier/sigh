@@ -3,6 +3,7 @@ package norswap.sigh;
 import norswap.autumn.Grammar;
 import norswap.sigh.ast.*;
 
+import static norswap.sigh.ast.UnaryOperator.LAUNCH;
 import static norswap.sigh.ast.UnaryOperator.NOT;
 
 @SuppressWarnings("Convert2MethodRef")
@@ -139,13 +140,11 @@ public class SighGrammar extends Grammar
         .suffix(function_args,
             $ -> new FunCallNode($.span(), $.$[0], $.$[1]));
 
-    /*
-    public rule launch_expression =
-        seq(_launch, basic_expression, function_args)
-            .push($ -> new LaunchNode($.span(), $.$[0], $.$[1]));*/
 
     public rule prefix_expression = right_expression()
         .operand(suffix_expression)
+        .prefix(_launch.as_val(LAUNCH),
+            $ -> new LaunchNode($.span(), $.$[1]))
         .prefix(BANG.as_val(NOT),
             $ -> new UnaryExpressionNode($.span(), $.$[0], $.$[1]));
 
@@ -154,8 +153,6 @@ public class SighGrammar extends Grammar
         SLASH       .as_val(BinaryOperator.DIVIDE),
         AT          .as_val(BinaryOperator.MAT_PRODUCT),
         PERCENT     .as_val(BinaryOperator.REMAINDER));
-
-    public rule launch_op = _launch.as_val(LaunchOperator.LAUNCH);
 
     public rule add_op = choice(
         PLUS        .as_val(BinaryOperator.ADD),
@@ -169,11 +166,6 @@ public class SighGrammar extends Grammar
         LANGLE      .as_val(BinaryOperator.LOWER),
         RANGLE      .as_val(BinaryOperator.GREATER));
 
-
-    // todo : besoin d'un argument à infix ?
-    public rule launch_expr = left_expression()
-        .operand(prefix_expression)
-        .infix(launch_op);
 
     public rule mult_expr = left_expression()
         .operand(prefix_expression)
@@ -200,12 +192,8 @@ public class SighGrammar extends Grammar
         .infix(BAR_BAR.as_val(BinaryOperator.OR),
             $ -> new BinaryExpressionNode($.span(), $.$[0], $.$[1], $.$[2]));
 
-    // todo problem here
     public rule assignment_expression = right_expression()
-        .operand(
-            or_expression
-        )
-        .infix(_launch) // public rule _launch = reserved("launch");
+        .operand(or_expression)
         .infix(EQUALS,
             $ -> new AssignmentNode($.span(), $.$[0], $.$[1]));
 
@@ -215,7 +203,9 @@ public class SighGrammar extends Grammar
     public rule expression_stmt =
         expression
         .filter($ -> {
-            if (!($.$[0] instanceof AssignmentNode || $.$[0] instanceof FunCallNode))
+            if (!($.$[0] instanceof AssignmentNode
+                || $.$[0] instanceof FunCallNode
+                || $.$[0] instanceof LaunchNode))
                 return false;
             $.push(new ExpressionStatementNode($.span(), $.$[0]));
             return true;
