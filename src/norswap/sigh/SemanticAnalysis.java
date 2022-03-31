@@ -119,6 +119,7 @@ public final class SemanticAnalysis
         walker.register(FieldAccessNode.class,          PRE_VISIT,  analysis::fieldAccess);
         walker.register(ArrayAccessNode.class,          PRE_VISIT,  analysis::arrayAccess);
         walker.register(FunCallNode.class,              PRE_VISIT,  analysis::funCall);
+        walker.register(LaunchNode.class,               PRE_VISIT,  analysis::launchCall);
         walker.register(UnaryExpressionNode.class,      PRE_VISIT,  analysis::unaryExpression);
         walker.register(BinaryExpressionNode.class,     PRE_VISIT,  analysis::binaryExpression);
         walker.register(AssignmentNode.class,           PRE_VISIT,  analysis::assignment);
@@ -436,6 +437,15 @@ public final class SemanticAnalysis
                         node.arguments.get(i));
             }
         });
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    // todo
+    private void launchCall(LaunchNode node)
+    {
+        R.rule(node, "type")
+        .using(node.)
     }
 
     // ---------------------------------------------------------------------------------------------
