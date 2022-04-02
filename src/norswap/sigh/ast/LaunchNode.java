@@ -9,10 +9,10 @@ public final class LaunchNode extends ExpressionNode
     Span span;
     public final FunCallNode funCall;
 
-    public LaunchNode (Span span, Object arguments) {
+    public LaunchNode (Span span, Object argument) {
         super(span);
         this.span = span;
-        this.funCall = Util.cast(arguments, FunCallNode.class);
+        this.funCall = Util.cast(argument, FunCallNode.class);
     }
 
     @Override
