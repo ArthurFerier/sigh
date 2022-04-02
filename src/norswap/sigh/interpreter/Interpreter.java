@@ -73,6 +73,7 @@ public final class Interpreter
         visitor.register(FieldAccessNode.class,          this::fieldAccess);
         visitor.register(ArrayAccessNode.class,          this::arrayAccess);
         visitor.register(FunCallNode.class,              this::funCall);
+        visitor.register(LaunchNode.class,               this::launchCall);
         visitor.register(UnaryExpressionNode.class,      this::unaryExpression);
         visitor.register(BinaryExpressionNode.class,     this::binaryExpression);
         visitor.register(AssignmentNode.class,           this::assignment);
@@ -630,6 +631,41 @@ public final class Interpreter
         FunDeclarationNode funDecl = (FunDeclarationNode) decl;
         coIterate(args, funDecl.parameters,
                 (arg, param) -> storage.set(scope, param.name, arg));
+
+        try {
+            get(funDecl.block);
+        } catch (Return r) {
+            return r.value;
+        } finally {
+            storage = oldStorage;
+        }
+        return null;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    private Object launchCall(LaunchNode launchNode) {
+        FunCallNode node = launchNode.funCall;
+        Object decl = get(node.function);
+        node.arguments.forEach(this::run);
+        Object[] args = map(node.arguments, new Object[0], visitor);
+
+        if (decl == Null.INSTANCE)
+            throw new PassthroughException(new NullPointerException("calling a null function"));
+
+        if (decl instanceof SyntheticDeclarationNode)
+            return builtin(((SyntheticDeclarationNode) decl).name(), args);
+
+        if (decl instanceof Constructor)
+            return buildStruct(((Constructor) decl).declaration, args);
+
+        ScopeStorage oldStorage = storage;
+        Scope scope = reactor.get(decl, "scope");
+        storage = new ScopeStorage(scope, storage);
+
+        FunDeclarationNode funDecl = (FunDeclarationNode) decl;
+        coIterate(args, funDecl.parameters,
+            (arg, param) -> storage.set(scope, param.name, arg));
 
         try {
             get(funDecl.block);

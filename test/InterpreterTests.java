@@ -326,6 +326,17 @@ public final class InterpreterTests extends TestFixture {
     // ---------------------------------------------------------------------------------------------
 
     @Test
+    public void testLaunch () {
+        rule = grammar.root;
+        check(
+            "fun add (a: Int, b: Int): Int { return a + b } " +
+                "return launch add(4, 7)",
+            11L);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
     public void testArrayStructAccess () {
         checkExpr("[1][0]", 1L);
         checkExpr("[1.0][0]", 1d);
