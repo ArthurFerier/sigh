@@ -444,10 +444,7 @@ public final class SemanticAnalysis
     // todo
     private void launchCall(LaunchNode node)
     {
-        int a = 0;
-        /*
-        R.rule(node, "type")
-        .by(r -> funCall(node.funCall));*/
+
     }
 
     // ---------------------------------------------------------------------------------------------

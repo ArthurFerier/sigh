@@ -316,7 +316,7 @@ public final class Interpreter
     }
 
     private Double multiplyMatricesCell(Object[][] firstMatrix, Object[][] secondMatrix, int row, int col) {
-        Double cell = 0.0;
+        double cell = 0.0;
         for (int i = 0; i < secondMatrix.length; i++) {
             cell += (Double) firstMatrix[row][i] * (Double) secondMatrix[i][col];
         }
