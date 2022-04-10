@@ -2,10 +2,13 @@
 var intVar: Int = 3
 print("intVar: " + intVar)
 
-//protect(intVar)
-
 fun validate5 (value: Int)
 {
+    var testP: Int = 8
+    protect:testP {
+        print("this code is locked")
+    }
+
     if (value!= 5)
         print("We wanted 5 but got: " + value)
 
@@ -17,4 +20,8 @@ fun validate5 (value: Int)
         print("It's just right.")
 }
 validate5(6)
-protect(2)
+var protectedVar: Int = 7
+protect:protectedVar {
+intVar = intVar+1
+print("intVar: " +intVar)
+}

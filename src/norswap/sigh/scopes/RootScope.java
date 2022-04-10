@@ -37,6 +37,8 @@ public final class RootScope extends Scope
 
     // root scope functions
     public final SyntheticDeclarationNode print = decl("print", FUNCTION);
+    public final SyntheticDeclarationNode protect = decl("protect", FUNCTION);
+    public final SyntheticDeclarationNode relax = decl("relax", FUNCTION);
 
     // ---------------------------------------------------------------------------------------------
 
@@ -62,6 +64,9 @@ public final class RootScope extends Scope
         reactor.set(_null,  "type",       NullType.INSTANCE);
 
         reactor.set(print,  "type", new FunType(StringType.INSTANCE, StringType.INSTANCE));
+        reactor.set(protect,  "type", new FunType(IntType.INSTANCE, IntType.INSTANCE));
+        reactor.set(relax,  "type", new FunType(IntType.INSTANCE, IntType.INSTANCE));
+
     }
 
     // ---------------------------------------------------------------------------------------------

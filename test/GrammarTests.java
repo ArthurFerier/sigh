@@ -3,6 +3,10 @@ import norswap.sigh.SighGrammar;
 import norswap.sigh.ast.*;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.concurrent.locks.ReentrantLock;
+
 import static java.util.Arrays.asList;
 import static norswap.sigh.ast.BinaryOperator.*;
 
@@ -158,14 +162,16 @@ public class GrammarTests extends AutumnTestFixture {
     // ---------------------------------------------------------------------------------------------
 
     @Test public void testProtect() {
-        successExpect("protect(protectedVar)", new ProtectCallNode(null,
-            new ReferenceNode(null, "protectedVar")));
+        rule = grammar.statement;
 
-    }
-
-    @Test public void testRelax() {
-        successExpect("relax(relaxedVar)", new RelaxCallNode(null,
-            new ReferenceNode(null, "relaxedVar")));
+        successExpect("protect:protectedVar {\n" +
+            "print(1)}", new ProtectBlockNode(null,
+            new ReferenceNode(null, "protectedVar"),
+            new BlockNode(null, asList(
+                new ExpressionStatementNode(null,  new FunCallNode(null,
+                    new ReferenceNode(null, "print"), asList(intlit(1)))
+                ))), new ReentrantLock())
+        );
 
     }
 

@@ -3,6 +3,8 @@ package norswap.sigh;
 import norswap.autumn.Grammar;
 import norswap.sigh.ast.*;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import static norswap.sigh.ast.UnaryOperator.LAUNCH;
 import static norswap.sigh.ast.UnaryOperator.NOT;
 
@@ -62,8 +64,8 @@ public class SighGrammar extends Grammar
     public rule _while          = reserved("while");
     public rule _return         = reserved("return");
     public rule _launch         = reserved("launch");
-    //public rule _protect        = reserved("protect");
-    //public rule _relax          = reserved("relax");
+    public rule _protect        = reserved("protect");
+    public rule _relax          = reserved("relax");
 
     public rule number =
         seq(opt('-'), choice('0', digit.at_least(1)));
@@ -121,14 +123,6 @@ public class SighGrammar extends Grammar
         seq(LSQUARE, expressions, RSQUARE)
         .push($ -> new ArrayLiteralNode($.span(), $.$[0]));
 
-    // TODO, make grammar work for protect and relax
-    /*public rule protect =
-        seq(_protect, LPAREN, reference, RPAREN)
-            .push($ -> new ProtectCallNode($.span(), $.$[0]));
-
-    public rule relax =
-        seq(_relax, LPAREN, reference, RPAREN)
-            .push($ -> new RelaxCallNode($.span(), $.$[0]));*/
 
     public rule basic_expression = choice(
         constructor,
@@ -235,6 +229,7 @@ public class SighGrammar extends Grammar
         this.block,
         this.var_decl,
         this.fun_decl,
+        this.protect_block,
         this.struct_decl,
         this.if_stmt,
         this.while_stmt,
@@ -267,6 +262,10 @@ public class SighGrammar extends Grammar
     public rule fun_decl =
         seq(_fun, identifier, LPAREN, parameters, RPAREN, maybe_return_type, block)
         .push($ -> new FunDeclarationNode($.span(), $.$[0], $.$[1], $.$[2], $.$[3]));
+
+    public rule protect_block =
+        seq(_protect, COLON, reference, block)
+            .push($ -> new ProtectBlockNode($.span(), $.$[0], $.$[1], new ReentrantLock()));
 
     public rule field_decl =
         seq(_var, identifier, COLON, type)

@@ -19,6 +19,9 @@ import norswap.utils.visitors.ValuedVisitor;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static norswap.utils.Util.cast;
 import static norswap.utils.Vanilla.coIterate;
@@ -76,6 +79,7 @@ public final class Interpreter
         visitor.register(LaunchNode.class,               this::launchCall);
         visitor.register(UnaryExpressionNode.class,      this::unaryExpression);
         visitor.register(BinaryExpressionNode.class,     this::binaryExpression);
+        visitor.register(ProtectBlockNode.class,         this::protectedBlock);
         visitor.register(AssignmentNode.class,           this::assignment);
 
         // statement groups & declarations
@@ -611,7 +615,6 @@ public final class Interpreter
 
     private Object funCall (FunCallNode node)
     {
-        System.out.println("FUNCALL: " + node.function);
         Object decl = get(node.function);
         node.arguments.forEach(this::run);
         Object[] args = map(node.arguments, new Object[0], visitor);
@@ -641,6 +644,21 @@ public final class Interpreter
             storage = oldStorage;
         }
         return null;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    private Object protectedBlock(ProtectBlockNode node) {
+        // TODO : node.protectedVar ne sert à rien, on la back ?
+        try {
+            node.lock.lock();
+            get(node.protectedBlock);
+            node.lock.unlock();
+        }
+        catch (Return r) {
+            return r.value;
+        }
+        return 1;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -680,27 +698,23 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
-    // TODO : protect() and relax() are other builtin functions
+    // TODO : protect() and relax() are other builtin functions (not anymore)
     private Object builtin (String name, Object[] args)
     {
-        if (name.equals("print")) {
-            //assert name.equals("print"); // only one at the moment
-            String out = convertToString(args[0]);
-            System.out.println(out);
-            return out;
-        }
-        if (name.equals("protect")) {
-            //assert name.equals("print"); // only one at the moment
-            System.out.println("protect");
-            return 0;
-        }
-        if (name.equals("relax")) {
-            System.out.println("relax");
-            return 0;
-        }
-        else {
-            throw new Error("Unknown function: " + name);
-        }
+        assert Objects.equals(name, "print");
+        String out = convertToString(args[0]);
+        System.out.println(out);
+        return out;
+    }
+
+    private void protect(Long var) {
+        System.out.println("Protecting var : " + var);
+        return;
+    }
+
+    private void relax(Long var) {
+        System.out.println("Relaxing var : " + var);
+        return;
     }
 
     // ---------------------------------------------------------------------------------------------

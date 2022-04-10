@@ -40,7 +40,7 @@ import static norswap.utils.visitors.WalkVisitType.PRE_VISIT;
  *     <li>Additionally, {@link StructDeclarationNode} (and default
  *     {@link SyntheticDeclarationNode} for types) must have their {@code declared} attribute set to
  *     an instance of the type being declared.</li>
- *
+
  *     <li>Every {@link ExpressionNode} instance must have its {@code type} attribute similarly
  *     set.</li>
  *
@@ -135,6 +135,7 @@ public final class SemanticAnalysis
         walker.register(FieldDeclarationNode.class,     PRE_VISIT,  analysis::fieldDecl);
         walker.register(ParameterNode.class,            PRE_VISIT,  analysis::parameter);
         walker.register(FunDeclarationNode.class,       PRE_VISIT,  analysis::funDecl);
+        walker.register(ProtectBlockNode.class,         PRE_VISIT,  analysis::protectBlock);
         walker.register(StructDeclarationNode.class,    PRE_VISIT,  analysis::structDecl);
 
         walker.register(RootNode.class,                 POST_VISIT, analysis::popScope);
@@ -871,6 +872,13 @@ public final class SemanticAnalysis
                 r.error("Missing return in function.", node);
             // NOTE: The returned value presence & type is checked in returnStmt().
         });
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    private void protectBlock(ProtectBlockNode node) {
+        // TODO
+        return;
     }
 
     // ---------------------------------------------------------------------------------------------
