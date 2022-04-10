@@ -36,7 +36,10 @@ fun add1000() {
     }
 }
 
+
 launch add1000()
 launch add1000()
 launch add1000()
+
+
 print("threadVar: " + threadedVar)

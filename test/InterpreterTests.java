@@ -328,10 +328,27 @@ public final class InterpreterTests extends TestFixture {
     @Test
     public void testLaunch () {
         rule = grammar.root;
+
+        long start = System.currentTimeMillis();
         check(
-            "fun add (a: Int, b: Int): Int { return a + b } " +
-                "return launch add(4, 7)",
-            11L);
+            "fun addUpTo1000 (a: Int): Int { while a < 1000000 { a = a + 1 } return a } " +
+                "launch addUpTo1000(1)" +
+                "return addUpTo1000(1)",
+            1000000L);
+        long end = System.currentTimeMillis();
+        long timeElapsedNoLaunch = end - start; // in milliseconds
+
+        start = System.currentTimeMillis();
+        check(
+            "fun addUpTo1000 (a: Int): Int { while a < 1000000 { a = a + 1 } return a } " +
+                "addUpTo1000(1)" +
+                "return addUpTo1000(1)",
+            1000000L);
+        end = System.currentTimeMillis();
+        long timeElapsedWithLaunch = end - start; // in milliseconds
+
+        assertTrue(timeElapsedWithLaunch * 1.4 <= timeElapsedNoLaunch);
+
     }
 
     // ---------------------------------------------------------------------------------------------
