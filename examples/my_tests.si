@@ -5,7 +5,7 @@ print("intVar: " + intVar)
 fun validate5 (value: Int)
 {
     var testP: Int = 8
-    protect:testP {
+    protect: {
         print("this code is locked")
     }
 
@@ -19,9 +19,24 @@ fun validate5 (value: Int)
     else
         print("It's just right.")
 }
-validate5(6)
-var protectedVar: Int = 7
-protect:protectedVar {
+protect: {
 intVar = intVar+1
 print("intVar: " +intVar)
 }
+
+launch print("0")
+validate5(6)
+
+var threadedVar: Int = 0
+fun add1000() {
+    var i: Int = 0
+    while i < 1000 {
+        threadedVar = threadedVar+1
+        i = i +1
+    }
+}
+
+launch add1000()
+launch add1000()
+launch add1000()
+print("threadVar: " + threadedVar)
