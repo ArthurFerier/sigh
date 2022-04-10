@@ -62,6 +62,8 @@ public class SighGrammar extends Grammar
     public rule _while          = reserved("while");
     public rule _return         = reserved("return");
     public rule _launch         = reserved("launch");
+    public rule _protect        = reserved("protect");
+    public rule _relax          = reserved("relax");
 
     public rule number =
         seq(opt('-'), choice('0', digit.at_least(1)));
@@ -119,6 +121,15 @@ public class SighGrammar extends Grammar
         seq(LSQUARE, expressions, RSQUARE)
         .push($ -> new ArrayLiteralNode($.span(), $.$[0]));
 
+    // TODO, make grammar work for protect and relax
+    public rule protect =
+        seq(_protect, LPAREN, reference, RPAREN)
+            .push($ -> new ProtectCallNode($.span(), $.$[0]));
+
+    public rule relax =
+        seq(_relax, LPAREN, reference, RPAREN)
+            .push($ -> new RelaxCallNode($.span(), $.$[0]));
+
     public rule basic_expression = choice(
         constructor,
         reference,
@@ -126,7 +137,8 @@ public class SighGrammar extends Grammar
         integer,
         string,
         paren_expression,
-        array);
+        array
+    );
 
     public rule function_args =
         seq(LPAREN, expressions, RPAREN);

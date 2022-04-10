@@ -65,17 +65,19 @@ fun foo_fun(): Int {return 4}
 var intVar1: Int = 3
 var intVar2: Int = 5
 var intVar3: Int = intVar1 + intVar2
+protect(intVar1)
 print("intVar3 : " + intVar3)
 
 
 
 var float2D: Float[][][] = [[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]]
-var float2DB: Float[][][] = [[[14.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]]
+var float2DB: Int[][][] = [[[14, 5, 7], [14, 5, 7]], [[5, 17, 23] , [-4, -10, -17]]]
 var sum2D: Float[] = float2D * float2DB
-print("sum2D[]0 = " + sum2D[0])
+print("sum2D[0] = " + sum2D[0])
 print("sum2D[1] = " + sum2D[1])
 
 var mat1: Float[][] = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]
-var mat2: Float[][] = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]
+var mat2: Int[][] = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]
 var result: Float[] = mat1 @ mat2
 print(""+result[1])
+

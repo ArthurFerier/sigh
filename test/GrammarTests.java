@@ -148,12 +148,24 @@ public class GrammarTests extends AutumnTestFixture {
 
         successExpect("var x: String = launch print(1)", new VarDeclarationNode(null,
             "x", new SimpleTypeNode(null, "String"),
-                new LaunchNode(null,
-                    new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))
-                )
-            ));
+            new LaunchNode(null,
+                new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))
+            )
+        ));
+    }
+    // todo : make tests failureExpects
 
-        // todo : make tests failureExpects
+    // ---------------------------------------------------------------------------------------------
+
+    @Test public void testProtect() {
+        successExpect("protect(protectedVar)", new ProtectCallNode(null,
+            new ReferenceNode(null, "protectedVar")));
+
+    }
+
+    @Test public void testRelax() {
+        successExpect("relax(relaxedVar)", new RelaxCallNode(null,
+            new ReferenceNode(null, "relaxedVar")));
 
     }
 
