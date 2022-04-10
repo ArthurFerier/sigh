@@ -1,0 +1,20 @@
+
+var intVar: Int = 3
+print("intVar: " + intVar)
+
+//protect(intVar)
+
+fun validate5 (value: Int)
+{
+    if (value!= 5)
+        print("We wanted 5 but got: " + value)
+
+    if (value > 5)
+        print("It was too big.")
+    else if (value < 5)
+        print("It was too small.")
+    else
+        print("It's just right.")
+}
+validate5(6)
+protect(2)

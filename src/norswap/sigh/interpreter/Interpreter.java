@@ -611,6 +611,7 @@ public final class Interpreter
 
     private Object funCall (FunCallNode node)
     {
+        System.out.println("FUNCALL: " + node.function);
         Object decl = get(node.function);
         node.arguments.forEach(this::run);
         Object[] args = map(node.arguments, new Object[0], visitor);
@@ -618,7 +619,7 @@ public final class Interpreter
         if (decl == Null.INSTANCE)
             throw new PassthroughException(new NullPointerException("calling a null function"));
 
-        if (decl instanceof SyntheticDeclarationNode)
+        if (decl instanceof SyntheticDeclarationNode) // TODO specify protect() and relax() as SyntheticDeclarationNode
             return builtin(((SyntheticDeclarationNode) decl).name(), args);
 
         if (decl instanceof Constructor)
@@ -679,12 +680,27 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
+    // TODO : protect() and relax() are other builtin functions
     private Object builtin (String name, Object[] args)
     {
-        assert name.equals("print"); // only one at the moment
-        String out = convertToString(args[0]);
-        System.out.println(out);
-        return out;
+        if (name.equals("print")) {
+            //assert name.equals("print"); // only one at the moment
+            String out = convertToString(args[0]);
+            System.out.println(out);
+            return out;
+        }
+        if (name.equals("protect")) {
+            //assert name.equals("print"); // only one at the moment
+            System.out.println("protect");
+            return 0;
+        }
+        if (name.equals("relax")) {
+            System.out.println("relax");
+            return 0;
+        }
+        else {
+            throw new Error("Unknown function: " + name);
+        }
     }
 
     // ---------------------------------------------------------------------------------------------

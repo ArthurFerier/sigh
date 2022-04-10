@@ -65,7 +65,6 @@ fun foo_fun(): Int {return 4}
 var intVar1: Int = 3
 var intVar2: Int = 5
 var intVar3: Int = intVar1 + intVar2
-protect(intVar1)
 print("intVar3 : " + intVar3)
 
 
@@ -77,7 +76,7 @@ print("sum2D[0] = " + sum2D[0])
 print("sum2D[1] = " + sum2D[1])
 
 var mat1: Float[][] = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]
-var mat2: Int[][] = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]
+var mat2: Float[][] = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]
 var result: Float[] = mat1 @ mat2
 print(""+result[1])
 
