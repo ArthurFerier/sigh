@@ -38,8 +38,9 @@ fun add1000() {
 
 
 launch add1000()
-launch add1000()
-launch add1000()
-
+var i: Int = 0
+while i < 10000000 {
+    i = i +1
+}
 
 print("threadVar: " + threadedVar)

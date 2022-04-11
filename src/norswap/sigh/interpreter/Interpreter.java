@@ -243,7 +243,7 @@ public final class Interpreter
             fright = right.doubleValue();
             ileft = iright = 0;
         } else {
-            ileft  = left.longValue();
+            ileft  = left.longValue(); // todo : left is null
             iright = right.longValue();
             fleft = fright = 0;
         }
@@ -666,6 +666,7 @@ public final class Interpreter
         Object decl;
         Object[] args;
         ScopeStorage storageThread;
+        ScopeStorage storageReturn;
 
         public LaunchThread(Object decl, Object[] args, ScopeStorage storageThread) {
             this.decl = decl;
@@ -685,6 +686,7 @@ public final class Interpreter
                 (arg, param) -> storage.set(scope, param.name, arg));
 
             get(funDecl.block);
+            storage = oldStorage;
         }
     }
 

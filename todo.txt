@@ -1,3 +1,14 @@
 in semantic : ask tutor how to make the launchcall return something
 in grammar test : ask tutor how to make a checkfail
 Faire marcher matricial product avec tout type de matrices (int et double)
+
+
+concernant les erreurs pour le launch :
+on a deux erreurs qui reviennent souvent mais pas tout le temps
+et pas en même temps (jusqu'à mtn),
+de temps en temps l'exécution termine.
+les erreurs sont
+NullPointerException: Cannot invoke "java.lang.Number.longValue()" because "left" is null
+=> j'arrive plus à avoir l'autre haha
+
+sinon on a le prob que en faisant launch, ça updtate pas la variable
