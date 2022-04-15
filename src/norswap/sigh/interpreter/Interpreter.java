@@ -666,18 +666,6 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
-    private Object protectedBlock(ProtectBlockNode node) {
-        // TODO : node.protectedVar ne sert à rien, on la back ?
-        try {
-            node.lock.lock();
-            get(node.protectedBlock);
-            node.lock.unlock();
-        }
-        catch (Return r) {
-            return r.value;
-        }
-        return 1;
-    }
     private class LaunchThread implements Runnable {
 
         Object decl;

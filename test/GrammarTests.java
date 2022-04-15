@@ -160,7 +160,7 @@ public class GrammarTests extends AutumnTestFixture {
     // todo : make tests failureExpects
 
     // ---------------------------------------------------------------------------------------------
-
+    
     @Test public void testProtect() {
         rule = grammar.statement;
 
@@ -175,4 +175,18 @@ public class GrammarTests extends AutumnTestFixture {
     }
 
     // ---------------------------------------------------------------------------------------------
+
+    @Test public void testMatricialProduct() {
+        rule = grammar.expression;
+
+        successExpect("[[1.0, 2.0, 3.0]] @ [[1.0, 2.0, 3.0]]",
+            new BinaryExpressionNode(null,
+                new ArrayLiteralNode(null, asList(new ArrayLiteralNode(null,
+                    asList(floatlit(1.0), floatlit(2.0), floatlit(3.0))))),
+                MAT_PRODUCT,
+                new ArrayLiteralNode(null, asList(new ArrayLiteralNode(null,
+                    asList(floatlit(1.0), floatlit(2.0), floatlit(3.0))))))
+            );
+
+    }
 }

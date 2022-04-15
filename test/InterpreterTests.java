@@ -325,7 +325,7 @@ public final class InterpreterTests extends TestFixture {
 
     // ---------------------------------------------------------------------------------------------
 
-    @Test
+    /*@Test
     public void testLaunch () {
         rule = grammar.root;
 
@@ -349,7 +349,7 @@ public final class InterpreterTests extends TestFixture {
 
         assertTrue(timeElapsedWithLaunch * 1.4 <= timeElapsedNoLaunch);
 
-    }
+    }*/
 
     // ---------------------------------------------------------------------------------------------
 
