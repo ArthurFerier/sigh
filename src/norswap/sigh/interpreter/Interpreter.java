@@ -340,8 +340,12 @@ public final class Interpreter
     private Object computeArrayExpression(Object[] ar1, Object[] ar2, BinaryOperator operator) {
         // verifying that the 2 arrays have the same length
         if (ar1.length != ar2.length) {
-            throw new Error("The two arrays must have the same length");
+            throw new Error("The two arrays must have the same length: array1 has length "+ar1.length+
+                " and array2 has length " + ar2.length);
         }
+
+        if (ar1.length == 0)
+            throw new Error("Arrays must be non-empty");
 
         Object[] res = new Object[ar1.length];
         if (ar1[0].getClass().isArray() && ar2[0].getClass().isArray()) {
@@ -635,6 +639,7 @@ public final class Interpreter
         Scope scope = reactor.get(decl, "scope");
         storage = new ScopeStorage(scope, storage);
 
+
         FunDeclarationNode funDecl = (FunDeclarationNode) decl;
         coIterate(args, funDecl.parameters,
                 (arg, param) -> storage.set(scope, param.name, arg));
@@ -652,7 +657,6 @@ public final class Interpreter
     // ---------------------------------------------------------------------------------------------
 
     private Object protectedBlock(ProtectBlockNode node) {
-        // TODO : node.protectedVar ne sert à rien, on la back ?
         try {
             node.lock.lock();
             get(node.protectedBlock);
@@ -676,25 +680,24 @@ public final class Interpreter
             throw new PassthroughException(new NullPointerException("calling a null function"));
 
         if (decl instanceof SyntheticDeclarationNode) {
-            new Thread(()->builtin(((SyntheticDeclarationNode) decl).name(), args));
+            new Thread(()->builtin(((SyntheticDeclarationNode) decl).name(), args)).start();
             return 1;
         }
 
         /*if (decl instanceof Constructor)
             return buildStruct(((Constructor) decl).declaration, args);*/ // TODO dire que dans la sémantique ça fonctionne pas
+        ScopeStorage oldStorage = storage;
+        Scope scope = reactor.get(decl, "scope");
+        storage = new ScopeStorage(scope, storage);
 
 
+        FunDeclarationNode funDecl = (FunDeclarationNode) decl;
+        coIterate(args, funDecl.parameters,
+            (arg, param) -> storage.set(scope, param.name, arg));
         Thread t = new Thread(new Runnable() {
             @Override
             public void run () {
-                ScopeStorage oldStorage = storage;
-                Scope scope = reactor.get(decl, "scope");
-                storage = new ScopeStorage(scope, storage);
-
-                FunDeclarationNode funDecl = (FunDeclarationNode) decl;
-                coIterate(args, funDecl.parameters,
-                    (arg, param) -> storage.set(scope, param.name, arg));
-                get(funDecl.block);
+                funCall(node);
             }
         });
 

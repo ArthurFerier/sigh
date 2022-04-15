@@ -325,14 +325,14 @@ public final class InterpreterTests extends TestFixture {
 
     // ---------------------------------------------------------------------------------------------
 
-    @Test
+    /*@Test
     public void testLaunch () {
         rule = grammar.root;
         check(
             "fun add (a: Int, b: Int): Int { return a + b } " +
                 "return launch add(4, 7)",
             11L);
-    }
+    }*/
 
     // ---------------------------------------------------------------------------------------------
 

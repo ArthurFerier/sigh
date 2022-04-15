@@ -36,7 +36,14 @@ fun add1000() {
     }
 }
 
-launch add1000()
-launch add1000()
+fun add1() {
+    print("adding 1")
+    threadedVar = threadedVar+1
+}
+
+
+var my_var: Int = 7
+launch print("my_var = " + my_var)
+//launch add1000()
 launch add1000()
 print("threadVar: " + threadedVar)
