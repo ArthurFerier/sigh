@@ -16,15 +16,10 @@ import norswap.utils.exceptions.Exceptions;
 import norswap.utils.exceptions.NoStackException;
 import norswap.utils.visitors.ValuedVisitor;
 //import org.graalvm.compiler.graph.spi.Canonicalizable.Binary;
-import java.sql.CallableStatement;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static norswap.utils.Util.cast;
 import static norswap.utils.Vanilla.coIterate;
@@ -248,7 +243,7 @@ public final class Interpreter
             fright = right.doubleValue();
             ileft = iright = 0;
         } else {
-            ileft  = left.longValue();
+            ileft  = left.longValue(); // todo : left is null
             iright = right.longValue();
             fleft = fright = 0;
         }
@@ -620,6 +615,21 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
+    private Object protectedBlock(ProtectBlockNode node) {
+        // TODO : node.protectedVar ne sert à rien, on la back ?
+        try {
+            node.lock.lock();
+            get(node.protectedBlock);
+            node.lock.unlock();
+        }
+        catch (Return r) {
+            return r.value;
+        }
+        return 1;
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
     private Object funCall (FunCallNode node)
     {
         Object decl = get(node.function);
@@ -657,6 +667,7 @@ public final class Interpreter
     // ---------------------------------------------------------------------------------------------
 
     private Object protectedBlock(ProtectBlockNode node) {
+        // TODO : node.protectedVar ne sert à rien, on la back ?
         try {
             node.lock.lock();
             get(node.protectedBlock);
@@ -667,11 +678,38 @@ public final class Interpreter
         }
         return 1;
     }
+    private class LaunchThread implements Runnable {
 
-    // ---------------------------------------------------------------------------------------------
+        Object decl;
+        Object[] args;
+        ScopeStorage storageThread;
+        ScopeStorage storageReturn;
+
+        public LaunchThread(Object decl, Object[] args, ScopeStorage storageThread) {
+            this.decl = decl;
+            this.args = args;
+            this.storageThread = storageThread;
+        }
+
+        @Override
+        public void run () {
+
+            ScopeStorage oldStorage = storageThread;
+            Scope scope = reactor.get(decl, "scope");
+            storage = new ScopeStorage(scope, storageThread);
+
+            FunDeclarationNode funDecl = (FunDeclarationNode) decl;
+            coIterate(args, funDecl.parameters,
+                (arg, param) -> storage.set(scope, param.name, arg));
+
+            get(funDecl.block);
+            storage = oldStorage;
+        }
+    }
 
     private Object launchCall(LaunchNode launchNode) {
         FunCallNode node = launchNode.funCall;
+
         Object decl = get(node.function);
         node.arguments.forEach(this::run);
         Object[] args = map(node.arguments, new Object[0], visitor);
@@ -704,7 +742,7 @@ public final class Interpreter
         try {
             t.start();
         } catch (Return r) {
-            System.out.println("returned value: "+r);;
+            System.out.println("returned value: "+r);
         }
         return 1;
     }
