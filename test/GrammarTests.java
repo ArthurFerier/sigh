@@ -150,6 +150,14 @@ public class GrammarTests extends AutumnTestFixture {
             )
         ));
 
+        successExpect("return launch print(1)",
+             new ReturnNode(null,
+                new LaunchNode(null,
+                    new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))
+                )
+            )
+        );
+
         successExpect("var x: String = launch print(1)", new VarDeclarationNode(null,
             "x", new SimpleTypeNode(null, "String"),
             new LaunchNode(null,
@@ -169,9 +177,9 @@ public class GrammarTests extends AutumnTestFixture {
             new BlockNode(null, asList(
                 new ExpressionStatementNode(null,  new FunCallNode(null,
                     new ReferenceNode(null, "print"), asList(intlit(1)))
-                ))), new ReentrantLock())
-        );
-
+                )
+            )
+        )));
     }
 
     // ---------------------------------------------------------------------------------------------

@@ -77,7 +77,7 @@ public final class Interpreter
         visitor.register(LaunchNode.class,               this::launchCall);
         visitor.register(UnaryExpressionNode.class,      this::unaryExpression);
         visitor.register(BinaryExpressionNode.class,     this::binaryExpression);
-        visitor.register(ProtectBlockNode.class,         this::protectedBlock);
+        //visitor.register(ProtectBlockNode.class,         this::protectedBlock);
         visitor.register(AssignmentNode.class,           this::assignment);
 
         // statement groups & declarations
@@ -226,14 +226,14 @@ public final class Interpreter
     {
         boolean left = get(node.left);
         return isAnd
-                ? left && (boolean) get(node.right)
-                : left || (boolean) get(node.right);
+            ? left && (boolean) get(node.right)
+            : left || (boolean) get(node.right);
     }
 
     // ---------------------------------------------------------------------------------------------
 
     private Object numericOp
-            (BinaryExpressionNode node, boolean floating, Number left, Number right)
+        (BinaryExpressionNode node, boolean floating, Number left, Number right)
     {
         long ileft, iright;
         double fleft, fright;
@@ -335,12 +335,8 @@ public final class Interpreter
     private Object computeArrayExpression(Object[] ar1, Object[] ar2, BinaryOperator operator) {
         // verifying that the 2 arrays have the same length
         if (ar1.length != ar2.length) {
-            throw new Error("The two arrays must have the same length: array1 has length "+ar1.length+
-                " and array2 has length " + ar2.length);
+            throw new Error("The two arrays must have the same length");
         }
-
-        if (ar1.length == 0)
-            throw new Error("Arrays must be non-empty");
 
         Object[] res = new Object[ar1.length];
         if (ar1[0].getClass().isArray() && ar2[0].getClass().isArray()) {
@@ -609,13 +605,13 @@ public final class Interpreter
             throw new PassthroughException(
                 new NullPointerException("accessing field of null object"));
         return stem instanceof Map
-                ? Util.<Map<String, Object>>cast(stem).get(node.fieldName)
-                : (long) ((Object[]) stem).length; // only field on arrays
+            ? Util.<Map<String, Object>>cast(stem).get(node.fieldName)
+            : (long) ((Object[]) stem).length; // only field on arrays
     }
 
     // ---------------------------------------------------------------------------------------------
 
-    private Object protectedBlock(ProtectBlockNode node) {
+    /*private Object protectedBlock(ProtectBlockNode node) {
         // TODO : node.protectedVar ne sert à rien, on la back ?
         try {
             node.lock.lock();
@@ -626,7 +622,7 @@ public final class Interpreter
             return r.value;
         }
         return 1;
-    }
+    }*/
 
     // ---------------------------------------------------------------------------------------------
 
@@ -649,10 +645,9 @@ public final class Interpreter
         Scope scope = reactor.get(decl, "scope");
         storage = new ScopeStorage(scope, storage);
 
-
         FunDeclarationNode funDecl = (FunDeclarationNode) decl;
         coIterate(args, funDecl.parameters,
-                (arg, param) -> storage.set(scope, param.name, arg));
+            (arg, param) -> storage.set(scope, param.name, arg));
 
         try {
             get(funDecl.block);
@@ -705,27 +700,16 @@ public final class Interpreter
         if (decl == Null.INSTANCE)
             throw new PassthroughException(new NullPointerException("calling a null function"));
 
-        if (decl instanceof SyntheticDeclarationNode) {
-            new Thread(()->builtin(((SyntheticDeclarationNode) decl).name(), args)).start();
-            return 1;
-        }
+        if (decl instanceof SyntheticDeclarationNode)
+            return builtin(((SyntheticDeclarationNode) decl).name(), args);
 
-        /*if (decl instanceof Constructor)
-            return buildStruct(((Constructor) decl).declaration, args);*/ // TODO dire que dans la sémantique ça fonctionne pas
-        ScopeStorage oldStorage = storage;
-        Scope scope = reactor.get(decl, "scope");
-        storage = new ScopeStorage(scope, storage);
+        if (decl instanceof Constructor)
+            return buildStruct(((Constructor) decl).declaration, args);
 
 
-        FunDeclarationNode funDecl = (FunDeclarationNode) decl;
-        coIterate(args, funDecl.parameters,
-            (arg, param) -> storage.set(scope, param.name, arg));
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run () {
-                funCall(node);
-            }
-        });
+        LaunchThread launchThread = new LaunchThread(decl, args, storage);
+
+        Thread t = new Thread(launchThread);
 
         try {
             t.start();
@@ -812,9 +796,9 @@ public final class Interpreter
         DeclarationNode decl = reactor.get(node, "decl");
 
         if (decl instanceof VarDeclarationNode
-        || decl instanceof ParameterNode
-        || decl instanceof SyntheticDeclarationNode
-                && ((SyntheticDeclarationNode) decl).kind() == DeclarationKind.VARIABLE)
+            || decl instanceof ParameterNode
+            || decl instanceof SyntheticDeclarationNode
+            && ((SyntheticDeclarationNode) decl).kind() == DeclarationKind.VARIABLE)
             return scope == rootScope
                 ? rootStorage.get(scope, node.name)
                 : storage.get(scope, node.name);

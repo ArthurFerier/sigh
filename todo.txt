@@ -1,6 +1,10 @@
 in semantic : ask tutor how to make the launchcall return something
+
 in grammar test : ask tutor how to make a checkfail
+
 Faire marcher matricial product avec tout type de matrices (int et double)
+
+je comprends pas ça sert à quoi de faire R.set dans le cas du block
 
 
 concernant les erreurs pour le launch :
@@ -9,6 +13,6 @@ et pas en même temps (jusqu'à mtn),
 de temps en temps l'exécution termine.
 les erreurs sont
 NullPointerException: Cannot invoke "java.lang.Number.longValue()" because "left" is null
-=> j'arrive plus à avoir l'autre haha
+NullPointerException: Cannot invoke "norswap.sigh.interpreter.ScopeStorage.set(norswap.sigh.scopes.Scope, String, Object)" because "this.parent" is null
 
 sinon on a le prob que en faisant launch, ça updtate pas la variable

@@ -1,32 +1,4 @@
 
-var intVar: Int = 3
-print("intVar: " + intVar)
-
-fun validate5 (value: Int)
-{
-    var testP: Int = 8
-    protect: {
-        print("this code is locked")
-    }
-
-    if (value!= 5)
-        print("We wanted 5 but got: " + value)
-
-    if (value > 5)
-        print("It was too big.")
-    else if (value < 5)
-        print("It was too small.")
-    else
-        print("It's just right.")
-}
-protect: {
-intVar = intVar+1
-print("intVar: " +intVar)
-}
-
-launch print("0")
-validate5(6)
-
 var threadedVar: Int = 0
 fun add1000() {
     var i: Int = 0
@@ -36,14 +8,11 @@ fun add1000() {
     }
 }
 
-fun add1() {
-    print("adding 1")
-    threadedVar = threadedVar+1
+
+launch add1000()
+var a: Int = 0
+while a < 1000000 {
+    a = a +1
 }
 
-
-var my_var: Int = 7
-launch print("my_var = " + my_var)
-//launch add1000()
-launch add1000()
 print("threadVar: " + threadedVar)

@@ -94,6 +94,7 @@ public final class SemanticAnalysis
     private SemanticAnalysis(Reactor reactor) {
         this.R = reactor;
     }
+    private boolean doFunCallAfter = true;
 
     // ---------------------------------------------------------------------------------------------
 
@@ -396,48 +397,51 @@ public final class SemanticAnalysis
 
     private void funCall (FunCallNode node)
     {
-        this.inferenceContext = node;
+        if (doFunCallAfter) {
+            this.inferenceContext = node;
 
-        Attribute[] dependencies = new Attribute[node.arguments.size() + 1];
-        dependencies[0] = node.function.attr("type");
-        forEachIndexed(node.arguments, (i, arg) -> {
-            dependencies[i + 1] = arg.attr("type");
-            R.set(arg, "index", i);
-        });
+            Attribute[] dependencies = new Attribute[node.arguments.size() + 1];
+            dependencies[0] = node.function.attr("type");
+            forEachIndexed(node.arguments, (i, arg) -> {
+                dependencies[i + 1] = arg.attr("type");
+                R.set(arg, "index", i);
+            });
 
-        R.rule(node, "type")
-        .using(dependencies)
-        .by(r -> {
-            Type maybeFunType = r.get(0);
+            R.rule(node, "type")
+                .using(dependencies)
+                .by(r -> {
+                    Type maybeFunType = r.get(0);
 
-            if (!(maybeFunType instanceof FunType)) {
-                r.error("trying to call a non-function expression: " + node.function, node.function);
-                return;
-            }
+                    if (!(maybeFunType instanceof FunType)) {
+                        r.error("trying to call a non-function expression: " + node.function, node.function);
+                        return;
+                    }
 
-            FunType funType = cast(maybeFunType);
-            r.set(0, funType.returnType);
+                    FunType funType = cast(maybeFunType);
+                    r.set(0, funType.returnType);
 
-            Type[] params = funType.paramTypes;
-            List<ExpressionNode> args = node.arguments;
+                    Type[] params = funType.paramTypes;
+                    List<ExpressionNode> args = node.arguments;
 
-            if (params.length != args.size())
-                r.errorFor(format("wrong number of arguments, expected %d but got %d",
-                        params.length, args.size()),
-                    node);
+                    if (params.length != args.size())
+                        r.errorFor(format("wrong number of arguments, expected %d but got %d",
+                                params.length, args.size()),
+                            node);
 
-            int checkedArgs = Math.min(params.length, args.size());
+                    int checkedArgs = Math.min(params.length, args.size());
 
-            for (int i = 0; i < checkedArgs; ++i) {
-                Type argType = r.get(i + 1);
-                Type paramType = funType.paramTypes[i];
-                if (!isAssignableTo(argType, paramType))
-                    r.errorFor(format(
-                            "incompatible argument provided for argument %d: expected %s but got %s",
-                            i, paramType, argType),
-                        node.arguments.get(i));
-            }
-        });
+                    for (int i = 0; i < checkedArgs; ++i) {
+                        Type argType = r.get(i + 1);
+                        Type paramType = funType.paramTypes[i];
+                        if (!isAssignableTo(argType, paramType))
+                            r.errorFor(format(
+                                    "incompatible argument provided for argument %d: expected %s but got %s",
+                                    i, paramType, argType),
+                                node.arguments.get(i));
+                    }
+                });
+        }
+        doFunCallAfter = true;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -445,7 +449,8 @@ public final class SemanticAnalysis
     // todo
     private void launchCall(LaunchNode node)
     {
-
+        funCall(node.funCall);
+        doFunCallAfter = false;
     }
 
     // ---------------------------------------------------------------------------------------------
