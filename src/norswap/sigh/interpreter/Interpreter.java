@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static norswap.utils.Util.cast;
 import static norswap.utils.Vanilla.coIterate;
@@ -57,11 +58,13 @@ public final class Interpreter
     private ScopeStorage storage = null;
     private RootScope rootScope;
     private ScopeStorage rootStorage;
+    private ReentrantLock lock;
 
     // ---------------------------------------------------------------------------------------------
 
     public Interpreter (Reactor reactor) {
         this.reactor = reactor;
+        this.lock = new ReentrantLock();
 
         // expressions
         visitor.register(IntLiteralNode.class,           this::intLiteral);
@@ -677,16 +680,18 @@ public final class Interpreter
         @Override
         public void run () {
 
-            ScopeStorage oldStorage = storageThread;
+            // todo : modifier le storage global que quand il faut, sinon on modifie le storage local du thread
+
+            ScopeStorage storageRun;
             Scope scope = reactor.get(decl, "scope");
-            storage = new ScopeStorage(scope, storageThread);
+            storageRun = new ScopeStorage(scope, storageThread);
 
             FunDeclarationNode funDecl = (FunDeclarationNode) decl;
             coIterate(args, funDecl.parameters,
-                (arg, param) -> storage.set(scope, param.name, arg));
+                (arg, param) -> storageRun.set(scope, param.name, arg));
 
             get(funDecl.block);
-            storage = oldStorage;
+
         }
     }
 
@@ -706,7 +711,7 @@ public final class Interpreter
         if (decl instanceof Constructor)
             return buildStruct(((Constructor) decl).declaration, args);
 
-
+        // make a deep copy of the storage to make a new one
         LaunchThread launchThread = new LaunchThread(decl, args, storage);
 
         Thread t = new Thread(launchThread);
@@ -799,9 +804,12 @@ public final class Interpreter
             || decl instanceof ParameterNode
             || decl instanceof SyntheticDeclarationNode
             && ((SyntheticDeclarationNode) decl).kind() == DeclarationKind.VARIABLE)
-            return scope == rootScope
-                ? rootStorage.get(scope, node.name)
-                : storage.get(scope, node.name);
+
+            if (scope == rootScope) {
+                return rootStorage.get(scope, node.name);
+            } else {
+                return storage.get(scope, node.name);
+            }
 
         return decl; // structure or function
     }

@@ -449,8 +449,8 @@ public final class SemanticAnalysis
     // todo
     private void launchCall(LaunchNode node)
     {
-        funCall(node.funCall);
-        doFunCallAfter = false;
+        //funCall(node.funCall);
+        //doFunCallAfter = false;
     }
 
     // ---------------------------------------------------------------------------------------------
