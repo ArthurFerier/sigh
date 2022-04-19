@@ -77,7 +77,7 @@ public final class Interpreter
         visitor.register(LaunchNode.class,               this::launchCall);
         visitor.register(UnaryExpressionNode.class,      this::unaryExpression);
         visitor.register(BinaryExpressionNode.class,     this::binaryExpression);
-        //visitor.register(ProtectBlockNode.class,         this::protectedBlock);
+        visitor.register(ProtectBlockNode.class,         this::protectedBlock);
         visitor.register(AssignmentNode.class,           this::assignment);
 
         // statement groups & declarations
@@ -335,7 +335,7 @@ public final class Interpreter
     private Object computeArrayExpression(Object[] ar1, Object[] ar2, BinaryOperator operator) {
         // verifying that the 2 arrays have the same length
         if (ar1.length != ar2.length) {
-            throw new Error("The two arrays must have the same length");
+            throw new Error("The two arrays must have the same length: array1.length is " + ar1.length + " and array2.length is " + ar2.length);
         }
 
         Object[] res = new Object[ar1.length];
@@ -611,8 +611,7 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
-    /*private Object protectedBlock(ProtectBlockNode node) {
-        // TODO : node.protectedVar ne sert à rien, on la back ?
+    private Object protectedBlock(ProtectBlockNode node) {
         try {
             node.lock.lock();
             get(node.protectedBlock);
@@ -622,7 +621,7 @@ public final class Interpreter
             return r.value;
         }
         return 1;
-    }*/
+    }
 
     // ---------------------------------------------------------------------------------------------
 
@@ -728,16 +727,6 @@ public final class Interpreter
         String out = convertToString(args[0]);
         System.out.println(out);
         return out;
-    }
-
-    private void protect(Long var) {
-        System.out.println("Protecting var : " + var);
-        return;
-    }
-
-    private void relax(Long var) {
-        System.out.println("Relaxing var : " + var);
-        return;
     }
 
     // ---------------------------------------------------------------------------------------------
