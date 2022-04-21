@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static norswap.utils.Util.cast;
 import static norswap.utils.Vanilla.coIterate;
@@ -58,13 +57,11 @@ public final class Interpreter
     private ScopeStorage storage = null;
     private RootScope rootScope;
     private ScopeStorage rootStorage;
-    private ReentrantLock lock;
 
     // ---------------------------------------------------------------------------------------------
 
     public Interpreter (Reactor reactor) {
         this.reactor = reactor;
-        this.lock = new ReentrantLock();
 
         // expressions
         visitor.register(IntLiteralNode.class,           this::intLiteral);
@@ -695,32 +692,36 @@ public final class Interpreter
         }
     }
 
+    private class LaunchInterpreter implements Runnable {
+
+        FunCallNode funcall;
+
+        public LaunchInterpreter(FunCallNode funcall) {
+            this.funcall = funcall;
+        }
+
+        @Override
+        public void run () {
+
+            Interpreter interpreter2 = new Interpreter(reactor);
+            //interpreter2.rootScope = rootScope;
+            interpreter2.rootStorage = rootStorage;
+            interpreter2.storage = storage;
+            interpreter2.interpret(funcall);
+
+        }
+    }
+
     private Object launchCall(LaunchNode launchNode) {
-        FunCallNode node = launchNode.funCall;
-
-        Object decl = get(node.function);
-        node.arguments.forEach(this::run);
-        Object[] args = map(node.arguments, new Object[0], visitor);
-
-        if (decl == Null.INSTANCE)
-            throw new PassthroughException(new NullPointerException("calling a null function"));
-
-        if (decl instanceof SyntheticDeclarationNode)
-            return builtin(((SyntheticDeclarationNode) decl).name(), args);
-
-        if (decl instanceof Constructor)
-            return buildStruct(((Constructor) decl).declaration, args);
-
-        // make a deep copy of the storage to make a new one
-        LaunchThread launchThread = new LaunchThread(decl, args, storage);
-
-        Thread t = new Thread(launchThread);
+        LaunchInterpreter launchInterpreter = new LaunchInterpreter(launchNode.funCall);
+        Thread t = new Thread(launchInterpreter);
 
         try {
             t.start();
-        } catch (Return r) {
-            System.out.println("returned value: "+r);
+        } catch (Exception e) {
+            System.out.println("thread didn't run correctly");
         }
+
         return 1;
     }
 
