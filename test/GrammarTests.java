@@ -183,7 +183,7 @@ public class GrammarTests extends AutumnTestFixture {
                     new ReferenceNode(null, "print"), asList(intlit(1)))
                 )
             )
-        )));
+        ), new ReentrantLock()));
     }
 
     // ---------------------------------------------------------------------------------------------
