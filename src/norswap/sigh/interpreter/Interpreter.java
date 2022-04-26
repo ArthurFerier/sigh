@@ -676,45 +676,51 @@ public final class Interpreter
         @Override
         public void run () {
 
-            ScopeStorage oldStorage = storageThread;
+            // todo : modifier le storage global que quand il faut, sinon on modifie le storage local du thread
+
+            ScopeStorage storageRun;
             Scope scope = reactor.get(decl, "scope");
-            storage = new ScopeStorage(scope, storageThread);
+            storageRun = new ScopeStorage(scope, storageThread);
 
             FunDeclarationNode funDecl = (FunDeclarationNode) decl;
             coIterate(args, funDecl.parameters,
-                (arg, param) -> storage.set(scope, param.name, arg));
+                (arg, param) -> storageRun.set(scope, param.name, arg));
 
             get(funDecl.block);
-            storage = oldStorage;
+
+        }
+    }
+
+    private class LaunchInterpreter implements Runnable {
+
+        FunCallNode funcall;
+
+        public LaunchInterpreter(FunCallNode funcall) {
+            this.funcall = funcall;
+        }
+
+        @Override
+        public void run () {
+
+            Interpreter interpreter2 = new Interpreter(reactor);
+            //interpreter2.rootScope = rootScope;
+            interpreter2.rootStorage = rootStorage;
+            interpreter2.storage = storage;
+            interpreter2.interpret(funcall);
+
         }
     }
 
     private Object launchCall(LaunchNode launchNode) {
-        FunCallNode node = launchNode.funCall;
-
-        Object decl = get(node.function);
-        node.arguments.forEach(this::run);
-        Object[] args = map(node.arguments, new Object[0], visitor);
-
-        if (decl == Null.INSTANCE)
-            throw new PassthroughException(new NullPointerException("calling a null function"));
-
-        if (decl instanceof SyntheticDeclarationNode)
-            return builtin(((SyntheticDeclarationNode) decl).name(), args);
-
-        if (decl instanceof Constructor)
-            return buildStruct(((Constructor) decl).declaration, args);
-
-
-        LaunchThread launchThread = new LaunchThread(decl, args, storage);
-
-        Thread t = new Thread(launchThread);
+        LaunchInterpreter launchInterpreter = new LaunchInterpreter(launchNode.funCall);
+        Thread t = new Thread(launchInterpreter);
 
         try {
             t.start();
-        } catch (Return r) {
-            System.out.println("returned value: "+r);
+        } catch (Exception e) {
+            System.out.println("thread didn't run correctly");
         }
+
         return 1;
     }
 
@@ -788,9 +794,12 @@ public final class Interpreter
             || decl instanceof ParameterNode
             || decl instanceof SyntheticDeclarationNode
             && ((SyntheticDeclarationNode) decl).kind() == DeclarationKind.VARIABLE)
-            return scope == rootScope
-                ? rootStorage.get(scope, node.name)
-                : storage.get(scope, node.name);
+
+            if (scope == rootScope) {
+                return rootStorage.get(scope, node.name);
+            } else {
+                return storage.get(scope, node.name);
+            }
 
         return decl; // structure or function
     }
