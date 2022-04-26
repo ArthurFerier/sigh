@@ -169,7 +169,7 @@ public class GrammarTests extends AutumnTestFixture {
 
     // ---------------------------------------------------------------------------------------------
     
-    @Test public void testProtect() {
+    /*@Test public void testProtect() {
         rule = grammar.statement;
 
         successExpect("protect: {\n" +
@@ -180,7 +180,7 @@ public class GrammarTests extends AutumnTestFixture {
                 )
             )
         ), new ReentrantLock()));
-    }
+    }*/
 
     // ---------------------------------------------------------------------------------------------
 
