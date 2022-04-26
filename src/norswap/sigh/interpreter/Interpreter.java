@@ -660,36 +660,6 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
-    private class LaunchThread implements Runnable {
-
-        Object decl;
-        Object[] args;
-        ScopeStorage storageThread;
-        ScopeStorage storageReturn;
-
-        public LaunchThread(Object decl, Object[] args, ScopeStorage storageThread) {
-            this.decl = decl;
-            this.args = args;
-            this.storageThread = storageThread;
-        }
-
-        @Override
-        public void run () {
-
-            // todo : modifier le storage global que quand il faut, sinon on modifie le storage local du thread
-
-            ScopeStorage storageRun;
-            Scope scope = reactor.get(decl, "scope");
-            storageRun = new ScopeStorage(scope, storageThread);
-
-            FunDeclarationNode funDecl = (FunDeclarationNode) decl;
-            coIterate(args, funDecl.parameters,
-                (arg, param) -> storageRun.set(scope, param.name, arg));
-
-            get(funDecl.block);
-
-        }
-    }
 
     private class LaunchInterpreter implements Runnable {
 

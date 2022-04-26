@@ -1,14 +1,18 @@
-var i: Int = 0
 var threadedVar: Int = 0
 
 fun add1000() {
-        while i < 10000 {
-            threadedVar = threadedVar+1
-            i = i +1
+        var i: Int = 0
+        protect : {
+            while i < 10000 {
+                threadedVar = threadedVar+1
+                i = i +1
+            }
         }
 }
 
 
+launch add1000()
+launch add1000()
 launch add1000()
 launch add1000()
 
