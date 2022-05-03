@@ -634,7 +634,7 @@ public final class Interpreter
         if (decl == Null.INSTANCE)
             throw new PassthroughException(new NullPointerException("calling a null function"));
 
-        if (decl instanceof SyntheticDeclarationNode) // TODO specify protect() and relax() as SyntheticDeclarationNode
+        if (decl instanceof SyntheticDeclarationNode) 
             return builtin(((SyntheticDeclarationNode) decl).name(), args);
 
         if (decl instanceof Constructor)
@@ -671,13 +671,11 @@ public final class Interpreter
 
         @Override
         public void run () {
-
             Interpreter interpreter2 = new Interpreter(reactor);
             //interpreter2.rootScope = rootScope;
             interpreter2.rootStorage = rootStorage;
             interpreter2.storage = storage;
             interpreter2.interpret(funcall);
-
         }
     }
 

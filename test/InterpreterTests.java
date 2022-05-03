@@ -438,5 +438,31 @@ public final class InterpreterTests extends TestFixture {
 
     // ---------------------------------------------------------------------------------------------
 
+    @Test public void testProtect() {
+        check("var threadedVar: Int = 0\n" +
+            "fun add1000() {\n" +
+            "        protect : {\n" +
+            "            var i: Int = 0\n" +
+            "            while i < 1000 {\n" +
+            "                threadedVar = threadedVar+1\n" +
+            "                i = i +1\n" +
+            "            }\n" +
+            "        }\n" +
+            "}\n" +
+            "launch add1000()\n" +
+            "launch add1000()\n" +
+            "launch add1000()\n" +
+            "launch add1000()\n" +
+            "\n" +
+            "var a: Int = 0\n" +
+            "while a < 100000 {\n" +
+            "    a = a +1\n" +
+            "}\n" +
+            "print(\"threadVar: \" + threadedVar)\n" +
+            "\n", null, "threadVar: 4000\n");
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
     // NOTE(norswap): Not incredibly complete, but should cover the basics.
 }
