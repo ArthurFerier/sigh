@@ -150,30 +150,30 @@ public class GrammarTests extends AutumnTestFixture {
             )
         ));
 
-        /*
+
         successExpect("return launch print(1)",
              new ReturnNode(null,
                 new LaunchNode(null,
                     new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))
                 )
             )
-        );*/
+        );
 
-        /*
+
         successExpect("var x: String = launch print(1)", new VarDeclarationNode(null,
             "x", new SimpleTypeNode(null, "String"),
             new LaunchNode(null,
                 new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))
             )
-        ));*/
+        ));
 
-
+        failure("launch a[3]");
+        failure("launch {var x: String = '3'}");
     }
-    // todo : make tests failureExpects
 
     // ---------------------------------------------------------------------------------------------
     
-    /*@Test public void testProtect() {
+    @Test public void testProtect() {
         rule = grammar.statement;
 
         successExpect("protect: {\n" +
@@ -184,7 +184,7 @@ public class GrammarTests extends AutumnTestFixture {
                 )
             )
         ), new ReentrantLock()));
-    }*/
+    }
 
     // ---------------------------------------------------------------------------------------------
 

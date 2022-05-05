@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.*;
 
 import static norswap.utils.Util.cast;
 import static norswap.utils.Vanilla.coIterate;
@@ -57,6 +58,8 @@ public final class Interpreter
     private ScopeStorage storage = null;
     private RootScope rootScope;
     private ScopeStorage rootStorage;
+
+    private ExecutorService executorService;
 
     // ---------------------------------------------------------------------------------------------
 
@@ -561,8 +564,22 @@ public final class Interpreter
         storage = rootStorage = new ScopeStorage(rootScope, null);
         storage.initRoot(rootScope);
 
+        int cores = Runtime.getRuntime().availableProcessors();
+
+        executorService = Executors.newFixedThreadPool(cores*2);
+
+
         try {
             node.statements.forEach(this::run);
+            executorService.shutdown();
+            try {
+                boolean terminated = false;
+                while (!executorService.isTerminated() && !terminated) {
+                    terminated = executorService.awaitTermination(1000, TimeUnit.MILLISECONDS);
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         } catch (Return r) {
             return r.value;
             // allow returning from the main script
@@ -683,10 +700,9 @@ public final class Interpreter
 
     private Object launchCall(LaunchNode launchNode) {
         LaunchInterpreter launchInterpreter = new LaunchInterpreter(launchNode.funCall);
-        Thread t = new Thread(launchInterpreter);
 
         try {
-            t.start();
+            executorService.execute(launchInterpreter);
         } catch (Exception e) {
             System.out.println("thread didn't run correctly");
         }

@@ -391,13 +391,13 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
     }
 
 
-    /*@Test
+    @Test
     public void testLaunch() {
         successInput(
             "fun add (a: Int, b: Int): Int { return a + b } " +
             "launch add(4, 6)"
         );
-    }*/
+    }
 
     // ---------------------------------------------------------------------------------------------
 

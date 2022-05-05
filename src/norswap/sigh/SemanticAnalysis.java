@@ -94,7 +94,6 @@ public final class SemanticAnalysis
     private SemanticAnalysis(Reactor reactor) {
         this.R = reactor;
     }
-    private boolean doFunCallAfter = true;
 
     // ---------------------------------------------------------------------------------------------
 
@@ -397,19 +396,19 @@ public final class SemanticAnalysis
 
     private void funCall (FunCallNode node)
     {
-        if (doFunCallAfter) {
-            this.inferenceContext = node;
 
-            Attribute[] dependencies = new Attribute[node.arguments.size() + 1];
-            dependencies[0] = node.function.attr("type");
-            forEachIndexed(node.arguments, (i, arg) -> {
-                dependencies[i + 1] = arg.attr("type");
-                R.set(arg, "index", i);
-            });
+        this.inferenceContext = node;
 
-            R.rule(node, "type")
-                .using(dependencies)
-                .by(r -> {
+        Attribute[] dependencies = new Attribute[node.arguments.size() + 1];
+        dependencies[0] = node.function.attr("type");
+        forEachIndexed(node.arguments, (i, arg) -> {
+            dependencies[i + 1] = arg.attr("type");
+            R.set(arg, "index", i);
+        });
+
+        R.rule(node, "type")
+            .using(dependencies)
+            .by(r -> {
                     Type maybeFunType = r.get(0);
 
                     if (!(maybeFunType instanceof FunType)) {
@@ -439,9 +438,8 @@ public final class SemanticAnalysis
                                     i, paramType, argType),
                                 node.arguments.get(i));
                     }
-                });
-        }
-        doFunCallAfter = true;
+                }
+            );
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -449,8 +447,7 @@ public final class SemanticAnalysis
     // todo
     private void launchCall(LaunchNode node)
     {
-        //funCall(node.funCall);
-        //doFunCallAfter = false;
+
     }
 
     // ---------------------------------------------------------------------------------------------
