@@ -119,6 +119,7 @@ public final class SemanticAnalysis
         walker.register(FieldAccessNode.class,          PRE_VISIT,  analysis::fieldAccess);
         walker.register(ArrayAccessNode.class,          PRE_VISIT,  analysis::arrayAccess);
         walker.register(FunCallNode.class,              PRE_VISIT,  analysis::funCall);
+        // todo : post visit for return type ???!
         walker.register(LaunchNode.class,               PRE_VISIT,  analysis::launchCall);
         walker.register(UnaryExpressionNode.class,      PRE_VISIT,  analysis::unaryExpression);
         walker.register(BinaryExpressionNode.class,     PRE_VISIT,  analysis::binaryExpression);

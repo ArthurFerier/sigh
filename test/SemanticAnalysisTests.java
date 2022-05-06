@@ -395,7 +395,7 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
     public void testLaunch() {
         successInput(
             "fun add (a: Int, b: Int): Int { return a + b } " +
-            "launch add(4, 6)"
+            "return launch add(4, 6)"
         );
     }
 
