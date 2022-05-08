@@ -6,7 +6,7 @@ import norswap.utils.Util;
 public final class LaunchNode extends ExpressionNode
 {
 
-    Span span;
+    public Span span;
     public final FunCallNode funCall;
 
     public LaunchNode (Span span, Object argument) {

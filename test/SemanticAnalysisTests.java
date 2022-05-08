@@ -394,12 +394,36 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
     @Test
     public void testLaunch() {
 
-        /*
-        successInput(
+        //struct don't work atm'
+        /*successInput(
                 "struct Point { var x: Int; var y: Int }" +
                 "fun returnStruct (a: Point): Point {return a}" +
-                ""
+                "var a : Point = launch returnStruct($Point(2, 3))"
         );*/
+
+        // integer
+        successInput(
+            "fun add (a: Int, b: Int): Int { return a+b }" +
+            "var c : Int = launch add(1, 2)"
+        );
+
+        // String
+        successInput(
+            "fun add (): String { return \"hello\" }" +
+            "var a : String = launch add()"
+        );
+
+        // Bool
+        successInput(
+            "fun add (): Bool { return true }" +
+            "var a : Bool = launch add()"
+        );
+
+        // Float
+        successInput(
+            "fun add (): Float { return 1.2 }" +
+            "var a : Float = add()"
+        );
 
         failureInputWith(
             "var a : Int[] = launch add(4, 6)" +

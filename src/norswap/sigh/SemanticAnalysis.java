@@ -473,7 +473,7 @@ public final class SemanticAnalysis
             } else if (typeArray.contents().equals("Null[]")) {
                 R.set(node, "type", new ArrayType(NullType.INSTANCE));
             }
-        } else {
+        }  else {
             SimpleTypeNode typeNode = (SimpleTypeNode) declNode.returnType;
             String type = typeNode.name;
             if (Objects.equals(type, "String")) {
@@ -486,6 +486,12 @@ public final class SemanticAnalysis
                 R.set(node, "type", FloatType.INSTANCE);
             } else if (Objects.equals(type, "Null")) {
                 R.set(node, "type", NullType.INSTANCE);
+            } else {
+                // case of a Struct
+                // todo : don't work with structures
+                ReferenceNode refNode = (ReferenceNode) node.funCall.function;
+                int a = 5;
+                R.set(node, "type", type);
             }
         }
 
