@@ -10,8 +10,10 @@ import norswap.sigh.types.*;
 import norswap.uranium.Attribute;
 import norswap.uranium.Reactor;
 import norswap.uranium.Rule;
+import norswap.uranium.SemanticError;
 import norswap.utils.visitors.ReflectiveFieldWalker;
 import norswap.utils.visitors.Walker;
+import org.w3c.dom.Node;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -449,7 +451,47 @@ public final class SemanticAnalysis
     private void launchCall(LaunchNode node)
     {
 
+        String functionName = ((ReferenceNode)node.funCall.function).name; // str add
+        DeclarationContext returnType = scope.lookup(functionName);
+        if (returnType == null) {
+            //R.error(new SemanticError("Function must be declared before launching the thread", null, node.funCall));
+            R.rule(node, "type")
+                .by(r -> r.error("Function must be declared before launching the thread", node));
+            return;
+        }
+        FunDeclarationNode declNode = (FunDeclarationNode) returnType.declaration;
+        if (declNode.returnType instanceof ArrayTypeNode) {
+            ArrayTypeNode typeArray = (ArrayTypeNode) declNode.returnType;
+            if (typeArray.contents().equals("Int[]")) {
+                R.set(node, "type", new ArrayType(IntType.INSTANCE));
+            } else if (typeArray.contents().equals("String[]")) {
+                R.set(node, "type", new ArrayType(StringType.INSTANCE));
+            } else if (typeArray.contents().equals("Bool[]")) {
+                R.set(node, "type", new ArrayType(BoolType.INSTANCE));
+            } else if (typeArray.contents().equals("Float[]")) {
+                R.set(node, "type", new ArrayType(FloatType.INSTANCE));
+            } else if (typeArray.contents().equals("Null[]")) {
+                R.set(node, "type", new ArrayType(NullType.INSTANCE));
+            }
+        } else {
+            SimpleTypeNode typeNode = (SimpleTypeNode) declNode.returnType;
+            String type = typeNode.name;
+            if (Objects.equals(type, "String")) {
+                R.set(node, "type", StringType.INSTANCE);
+            } else if (Objects.equals(type, "Int")) {
+                R.set(node, "type", IntType.INSTANCE);
+            } else if (Objects.equals(type, "Bool")) {
+                R.set(node, "type", BoolType.INSTANCE);
+            } else if (Objects.equals(type, "Float")) {
+                R.set(node, "type", FloatType.INSTANCE);
+            } else if (Objects.equals(type, "Null")) {
+                R.set(node, "type", NullType.INSTANCE);
+            }
+        }
+
+
     }
+
 
     // ---------------------------------------------------------------------------------------------
 

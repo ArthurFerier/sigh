@@ -1,4 +1,4 @@
-    // This file showcases every single syntactic feature in the language.
+// This file showcases every single syntactic feature in the language.
 
 fun array_add (a: Int[]): Int
 {

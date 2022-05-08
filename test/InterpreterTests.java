@@ -356,9 +356,9 @@ public final class InterpreterTests extends TestFixture {
     public void returnLaunch () {
         rule = grammar.root;
         check(
-            "fun addUpTo1000 (a: Int): Int { while a < 10000000 { a = a + 1 } return a } " +
-                "return launch addUpTo1000(1)",
-            1);
+            "fun addUpTo1000 (a: Int): Int { while a < 10000 { a = a + 1 } return a } " +
+                "var a : Int = launch addUpTo1000(1)",
+            null);
     }
 
     // ---------------------------------------------------------------------------------------------

@@ -393,9 +393,18 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
 
     @Test
     public void testLaunch() {
+
+        /*
         successInput(
-            "fun add (a: Int, b: Int): Int { return a + b } " +
-            "return launch add(4, 6)"
+                "struct Point { var x: Int; var y: Int }" +
+                "fun returnStruct (a: Point): Point {return a}" +
+                ""
+        );*/
+
+        failureInputWith(
+            "var a : Int[] = launch add(4, 6)" +
+            "fun add (a: Int, b: Int): Int[] { return [a, b] } ",
+            "Function must be declared before launching the thread"
         );
     }
 
