@@ -2,4 +2,9 @@ in semantic : ask tutor how to make the launchcall return something
 
 
 semantic for the wait : null type is the bottom type for everything
-=> while return of launch == null : wait 
+=> while return of launch == null : wait
+
+
+semantic for the launch return : make it good for structs
+semantic for the wait : make it that it can take multiple sort of arguments
+(rootscope)

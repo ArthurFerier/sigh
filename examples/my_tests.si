@@ -1,20 +1,21 @@
 var threadedVar: Int = 0
-fun add1000() {
-            var i: Int = 0
+
+fun add1000(): Int {
+        var i: Int = 0
+        protect : {
             while i < 10000 {
                 threadedVar = threadedVar+1
                 i = i +1
             }
+        }
+        return 5
 }
-launch add1000()
-launch add1000()
-launch add1000()
-launch add1000()
 
-//print("" +i)
-var a: Int = 0
-while a < 100000 {
-    a = a + 1
-}
-print("threadVar: " + threadedVar)
+
+var returned : Int = launch add1000()
+
+wait(returned)
+
+print("bonjour")
+print(""+returned)
 

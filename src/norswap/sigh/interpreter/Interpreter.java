@@ -1,6 +1,8 @@
 package norswap.sigh.interpreter;
 
+import com.sun.jdi.IntegerType;
 import norswap.sigh.ast.*;
+import norswap.sigh.scopes.DeclarationContext;
 import norswap.sigh.scopes.DeclarationKind;
 import norswap.sigh.scopes.RootScope;
 import norswap.sigh.scopes.Scope;
@@ -16,10 +18,7 @@ import norswap.utils.exceptions.Exceptions;
 import norswap.utils.exceptions.NoStackException;
 import norswap.utils.visitors.ValuedVisitor;
 //import org.graalvm.compiler.graph.spi.Canonicalizable.Binary;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static norswap.utils.Util.cast;
@@ -651,8 +650,15 @@ public final class Interpreter
         if (decl == Null.INSTANCE)
             throw new PassthroughException(new NullPointerException("calling a null function"));
 
-        if (decl instanceof SyntheticDeclarationNode) 
-            return builtin(((SyntheticDeclarationNode) decl).name(), args);
+        if (decl instanceof SyntheticDeclarationNode) {
+            List<Object> objects = new ArrayList<>();
+            objects.add(args[0]);
+            if (node.arguments.get(0) instanceof ReferenceNode) {
+                ReferenceNode referenceNode = (ReferenceNode) node.arguments.get(0);
+                objects.add(referenceNode.name);
+            }
+            return builtin(((SyntheticDeclarationNode) decl).name(), objects.toArray());
+        }
 
         if (decl instanceof Constructor)
             return buildStruct(((Constructor) decl).declaration, args);
@@ -681,6 +687,7 @@ public final class Interpreter
     private class LaunchInterpreter implements Runnable {
 
         FunCallNode funcall;
+        Object returnObject = null;
 
         public LaunchInterpreter(FunCallNode funcall) {
             this.funcall = funcall;
@@ -692,7 +699,10 @@ public final class Interpreter
             //interpreter2.rootScope = rootScope;
             interpreter2.rootStorage = rootStorage;
             interpreter2.storage = storage;
-            interpreter2.interpret(funcall);
+            returnObject = interpreter2.interpret(funcall);
+            // todo : assign the object to the real return of the function
+            // todo : see to which variable the return is attached to
+            int a = 48;
         }
     }
 
@@ -705,7 +715,7 @@ public final class Interpreter
             System.out.println("thread didn't run correctly");
         }
 
-        return 1;
+        return launchInterpreter;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -713,10 +723,33 @@ public final class Interpreter
     // TODO : protect() and relax() are other builtin functions (not anymore)
     private Object builtin (String name, Object[] args)
     {
-        assert Objects.equals(name, "print");
-        String out = convertToString(args[0]);
-        System.out.println(out);
-        return out;
+        if (Objects.equals(name, "print")) {
+            String out = convertToString(args[0]);
+            System.out.println(out);
+            return out;
+        } else if (Objects.equals(name, "wait")) {
+            while (true) {
+                try {
+                    java.util.concurrent.TimeUnit.SECONDS.sleep(2);
+                } catch (Exception e) {
+                    System.out.println("problem with waiting");
+                }
+                if (((LaunchInterpreter) args[0]).returnObject != null) {
+                    //return ((LaunchInterpreter) args[0]).returnObject;
+                    Object returnObject2 = ((LaunchInterpreter) args[0]).returnObject;
+                    if (returnObject2.getClass() == Integer.class || returnObject2.getClass() == Long.class) {
+                        assert returnObject2 instanceof Long;
+                        long integerReturn = (Long) returnObject2;
+                        // now I have to put the updated variable in the variable back
+                        assign(rootScope, args[1].toString(), integerReturn, IntType.INSTANCE);
+                        int a = 487;
+                    }
+                    return null;
+                }
+            }
+        } else {
+            throw new Error("This is not a builtin function : " + name);
+        }
     }
 
     // ---------------------------------------------------------------------------------------------

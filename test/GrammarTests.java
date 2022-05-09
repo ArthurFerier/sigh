@@ -3,6 +3,7 @@ import norswap.sigh.SighGrammar;
 import norswap.sigh.ast.*;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantLock;
@@ -139,6 +140,16 @@ public class GrammarTests extends AutumnTestFixture {
         successExpect("while 1 < 2 { return } ", new WhileNode(null,
             new BinaryExpressionNode(null, intlit(1), LOWER, intlit(2)),
             new BlockNode(null, asList(new ReturnNode(null, null)))));
+    }
+
+    @Test
+    public void testWait() {
+        rule = grammar.statement;
+        ReferenceNode ref = new ReferenceNode(null, "a");
+        ArrayList<ReferenceNode> a = new ArrayList<>();
+        a.add(ref);
+        successExpect("wait(a)", new ExpressionStatementNode(null,
+            new FunCallNode(null, new ReferenceNode(null, "wait"), a)));
     }
 
     @Test public void testLaunch() {

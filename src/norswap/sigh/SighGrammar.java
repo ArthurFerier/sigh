@@ -65,7 +65,6 @@ public class SighGrammar extends Grammar
     public rule _return         = reserved("return");
     public rule _launch         = reserved("launch");
     public rule _protect        = reserved("protect");
-    public rule _relax          = reserved("relax");
 
     public rule number =
         seq(opt('-'), choice('0', digit.at_least(1)));

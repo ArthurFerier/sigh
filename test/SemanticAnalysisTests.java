@@ -382,6 +382,12 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
             "return add(4, 7)");
 
         successInput(
+            "fun add (a: Int, b: Int): Int { return a + b } " +
+            "var c : Int = launch add(1, 3)" +
+            "wait(c)"
+        );
+
+        successInput(
             "struct Point { var x: Int; var y: Int }" +
             "return $Point(1, 2)");
 
@@ -429,6 +435,15 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
             "var a : Int[] = launch add(4, 6)" +
             "fun add (a: Int, b: Int): Int[] { return [a, b] } ",
             "Function must be declared before launching the thread"
+        );
+    }
+
+    @Test
+    public void testWait() {
+        successInput(
+            "var a : Int = 3" +
+            "wait(a)" +
+            "return a"
         );
     }
 
