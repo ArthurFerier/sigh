@@ -14,8 +14,10 @@ fun add1000(): Int {
 
 var returned : Int = launch add1000()
 
+
+% function thread
+launch returned = add1000()
 wait(returned)
 
 print("bonjour")
 print(""+returned)
-

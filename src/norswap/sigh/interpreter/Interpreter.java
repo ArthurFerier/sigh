@@ -700,9 +700,8 @@ public final class Interpreter
             interpreter2.rootStorage = rootStorage;
             interpreter2.storage = storage;
             returnObject = interpreter2.interpret(funcall);
-            // todo : assign the object to the real return of the function
-            // todo : see to which variable the return is attached to
-            int a = 48;
+
+
         }
     }
 
