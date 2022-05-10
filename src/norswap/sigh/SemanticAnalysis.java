@@ -450,7 +450,7 @@ public final class SemanticAnalysis
     // todo
     private void launchCall(LaunchNode node)
     {
-
+        /*
         String functionName = ((ReferenceNode)node.funCall.function).name; // str add
         DeclarationContext returnType = scope.lookup(functionName);
         if (returnType == null) {
@@ -495,7 +495,7 @@ public final class SemanticAnalysis
             }
         }
 
-
+        */
     }
 
 

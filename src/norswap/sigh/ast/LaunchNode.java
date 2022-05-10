@@ -7,17 +7,27 @@ public final class LaunchNode extends ExpressionNode
 {
 
     public Span span;
-    public final FunCallNode funCall;
+    public VarDeclarationNode varDeclaration;
+    public FunCallNode funCallNode;
 
     public LaunchNode (Span span, Object argument) {
         super(span);
         this.span = span;
-        this.funCall = Util.cast(argument, FunCallNode.class);
+        if (argument instanceof FunCallNode) {
+            this.funCallNode = Util.cast(argument, FunCallNode.class);
+        } else if (argument instanceof VarDeclarationNode) {
+            this.varDeclaration = Util.cast(argument, VarDeclarationNode.class);
+        }
     }
+
+
 
     @Override
     public String contents ()
     {
-        return funCall.contents();
+        if (varDeclaration == null) {
+            return funCallNode.contents();
+        }
+        return varDeclaration.contents();
     }
 }

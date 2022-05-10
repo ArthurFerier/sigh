@@ -16,7 +16,7 @@ var returned : Int = launch add1000()
 
 
 % function thread
-launch returned = add1000()
+launch var returned : Int = add1000()
 wait(returned)
 
 print("bonjour")

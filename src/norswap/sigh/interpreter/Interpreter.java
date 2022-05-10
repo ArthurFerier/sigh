@@ -76,7 +76,7 @@ public final class Interpreter
         visitor.register(FieldAccessNode.class,          this::fieldAccess);
         visitor.register(ArrayAccessNode.class,          this::arrayAccess);
         visitor.register(FunCallNode.class,              this::funCall);
-        visitor.register(LaunchNode.class,               this::launchCall);
+        //visitor.register(LaunchNode.class,               this::launchCall);
         visitor.register(UnaryExpressionNode.class,      this::unaryExpression);
         visitor.register(BinaryExpressionNode.class,     this::binaryExpression);
         visitor.register(ProtectBlockNode.class,         this::protectedBlock);
@@ -683,7 +683,7 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
-
+    /*
     private class LaunchInterpreter implements Runnable {
 
         FunCallNode funcall;
@@ -715,7 +715,7 @@ public final class Interpreter
         }
 
         return launchInterpreter;
-    }
+    }*/
 
     // ---------------------------------------------------------------------------------------------
 
@@ -726,7 +726,7 @@ public final class Interpreter
             String out = convertToString(args[0]);
             System.out.println(out);
             return out;
-        } else if (Objects.equals(name, "wait")) {
+        }/* else if (Objects.equals(name, "wait")) {
             while (true) {
                 try {
                     java.util.concurrent.TimeUnit.SECONDS.sleep(2);
@@ -746,7 +746,7 @@ public final class Interpreter
                     return null;
                 }
             }
-        } else {
+        } */else {
             throw new Error("This is not a builtin function : " + name);
         }
     }

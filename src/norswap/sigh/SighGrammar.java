@@ -153,6 +153,7 @@ public class SighGrammar extends Grammar
         .prefix(BANG.as_val(NOT),
             $ -> new UnaryExpressionNode($.span(), $.$[0], $.$[1]));
 
+
     public rule mult_op = choice(
         STAR        .as_val(BinaryOperator.MULTIPLY),
         SLASH       .as_val(BinaryOperator.DIVIDE),
@@ -227,6 +228,7 @@ public class SighGrammar extends Grammar
     public rule statement = lazy(() -> choice(
         this.block,
         this.var_decl,
+        this.var_decl_launch,
         this.fun_decl,
         this.protect_block,
         this.struct_decl,
@@ -246,6 +248,11 @@ public class SighGrammar extends Grammar
     public rule var_decl =
         seq(_var, identifier, COLON, type, EQUALS, expression)
         .push($ -> new VarDeclarationNode($.span(), $.$[0], $.$[1], $.$[2]));
+
+    public rule var_decl_launch =
+        seq(_launch, var_decl)
+            .push($ -> new LaunchNode($.span(), $.$[0]));
+
 
     public rule parameter =
         seq(identifier, COLON, type)
