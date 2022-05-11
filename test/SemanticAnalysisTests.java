@@ -400,12 +400,12 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
     @Test
     public void testLaunch() {
 
-        //struct don't work atm'
-        /*successInput(
+
+        successInput(
                 "struct Point { var x: Int; var y: Int }" +
                 "fun returnStruct (a: Point): Point {return a}" +
-                "var a : Point = launch returnStruct($Point(2, 3))"
-        );*/
+                "launch var a : Point = returnStruct($Point(2, 3))"
+        );
 
         // integer
         successInput(
@@ -446,6 +446,10 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         failureInputWith("launch var a : Int = 5",
             "The thread must launch a function"
         );
+
+        failureInputWith("fun add (): Float { return 1.2 }" +
+            "var a : Float = launch add()",
+            "Launch keyword cannot be after the var declaration");
     }
 
     @Test

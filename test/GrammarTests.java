@@ -155,14 +155,14 @@ public class GrammarTests extends AutumnTestFixture {
     @Test public void testLaunch() {
         rule = grammar.statement;
 
-        /*
+
         successExpect("return launch print(1)",
              new ReturnNode(null,
                 new LaunchNode(null,
                     new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))
                 )
             )
-        );*/
+        );
 
 
         successExpect("launch var x: String = print(1)",
@@ -183,9 +183,11 @@ public class GrammarTests extends AutumnTestFixture {
             )
         );
 
-        //failure("var x : Int = launch print(3)"); // test passes, but it shouldn't
-
         failure("launch {var x: String = '3'}");
+        failure("launch struct Pair {\n" +
+            "    var a: Int\n" +
+            "    var b: Int\n" +
+            "}");
     }
 
     // ---------------------------------------------------------------------------------------------

@@ -876,6 +876,13 @@ public final class SemanticAnalysis
 
     private void varDecl (VarDeclarationNode node)
     {
+
+        if (node.initializer instanceof LaunchNode) {
+            R.rule(node, "type")
+                .by(r -> r.error("Launch keyword cannot be after the var declaration", node));
+            return;
+        }
+
         this.inferenceContext = node;
 
         scope.declare(node.name, node);
