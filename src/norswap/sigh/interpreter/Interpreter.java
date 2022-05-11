@@ -1,17 +1,12 @@
 package norswap.sigh.interpreter;
 
-import com.sun.jdi.IntegerType;
 import norswap.sigh.ast.*;
 import norswap.sigh.scopes.DeclarationContext;
 import norswap.sigh.scopes.DeclarationKind;
 import norswap.sigh.scopes.RootScope;
 import norswap.sigh.scopes.Scope;
 import norswap.sigh.scopes.SyntheticDeclarationNode;
-import norswap.sigh.types.ArrayType;
-import norswap.sigh.types.FloatType;
-import norswap.sigh.types.IntType;
-import norswap.sigh.types.StringType;
-import norswap.sigh.types.Type;
+import norswap.sigh.types.*;
 import norswap.uranium.Reactor;
 import norswap.utils.Util;
 import norswap.utils.exceptions.Exceptions;
@@ -76,7 +71,7 @@ public final class Interpreter
         visitor.register(FieldAccessNode.class,          this::fieldAccess);
         visitor.register(ArrayAccessNode.class,          this::arrayAccess);
         visitor.register(FunCallNode.class,              this::funCall);
-        //visitor.register(LaunchNode.class,               this::launchCall);
+        visitor.register(LaunchNode.class,               this::launchCall);
         visitor.register(UnaryExpressionNode.class,      this::unaryExpression);
         visitor.register(BinaryExpressionNode.class,     this::binaryExpression);
         visitor.register(ProtectBlockNode.class,         this::protectedBlock);
@@ -683,14 +678,15 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
-    /*
+
     private class LaunchInterpreter implements Runnable {
 
         FunCallNode funcall;
-        Object returnObject = null;
+        VarDeclarationNode varDecl;
 
-        public LaunchInterpreter(FunCallNode funcall) {
+        public LaunchInterpreter (FunCallNode funcall, VarDeclarationNode varDecl) {
             this.funcall = funcall;
+            this.varDecl = varDecl;
         }
 
         @Override
@@ -699,23 +695,27 @@ public final class Interpreter
             //interpreter2.rootScope = rootScope;
             interpreter2.rootStorage = rootStorage;
             interpreter2.storage = storage;
-            returnObject = interpreter2.interpret(funcall);
+            if (funcall == null) {
+                Object result = interpreter2.interpret(varDecl);
+                Scope scope = reactor.get(varDecl, "scope");
+                assign(scope, varDecl.name, get(varDecl.initializer), reactor.get(varDecl, "type"));
+            } else {
+                interpreter2.interpret(funcall);
+            }
 
 
         }
     }
 
-    private Object launchCall(LaunchNode launchNode) {
-        LaunchInterpreter launchInterpreter = new LaunchInterpreter(launchNode.funCall);
-
+    private Object launchCall(LaunchNode node) {
+        LaunchInterpreter launchInterpreter = new LaunchInterpreter(node.funCall, node.varDeclaration);
         try {
             executorService.execute(launchInterpreter);
         } catch (Exception e) {
             System.out.println("thread didn't run correctly");
         }
-
-        return launchInterpreter;
-    }*/
+        return VoidType.INSTANCE;
+    }
 
     // ---------------------------------------------------------------------------------------------
 
@@ -726,13 +726,14 @@ public final class Interpreter
             String out = convertToString(args[0]);
             System.out.println(out);
             return out;
-        }/* else if (Objects.equals(name, "wait")) {
+        } else if (Objects.equals(name, "wait")) {
             while (true) {
                 try {
                     java.util.concurrent.TimeUnit.SECONDS.sleep(2);
                 } catch (Exception e) {
                     System.out.println("problem with waiting");
                 }
+                /*
                 if (((LaunchInterpreter) args[0]).returnObject != null) {
                     //return ((LaunchInterpreter) args[0]).returnObject;
                     Object returnObject2 = ((LaunchInterpreter) args[0]).returnObject;
@@ -744,9 +745,15 @@ public final class Interpreter
                         int a = 487;
                     }
                     return null;
+                }*/
+                // if variable is not void anymore
+                try {
+                    rootStorage.get(rootScope, args[0].toString());
+                    return null;
+                } catch (Exception ignored) {
                 }
             }
-        } */else {
+        } else {
             throw new Error("This is not a builtin function : " + name);
         }
     }

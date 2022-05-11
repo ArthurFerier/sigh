@@ -3,7 +3,7 @@ var threadedVar: Int = 0
 fun add1000(): Int {
         var i: Int = 0
         protect : {
-            while i < 10000 {
+            while i < 100000 {
                 threadedVar = threadedVar+1
                 i = i +1
             }
@@ -12,12 +12,8 @@ fun add1000(): Int {
 }
 
 
-var returned : Int = launch add1000()
 
 
-% function thread
-launch var returned : Int = add1000()
-wait(returned)
+launch add1000()
 
 print("bonjour")
-print(""+returned)
