@@ -410,31 +410,41 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         // integer
         successInput(
             "fun add (a: Int, b: Int): Int { return a+b }" +
-            "var c : Int = launch add(1, 2)"
+            "launch var c : Int = add(1, 2)"
         );
 
         // String
         successInput(
             "fun add (): String { return \"hello\" }" +
-            "var a : String = launch add()"
+            "launch var a : String = add()"
         );
 
         // Bool
         successInput(
             "fun add (): Bool { return true }" +
-            "var a : Bool = launch add()"
+            "launch var a : Bool = add()"
         );
 
         // Float
         successInput(
             "fun add (): Float { return 1.2 }" +
-            "var a : Float = add()"
+            "launch var a : Float = add()"
         );
 
         failureInputWith(
-            "var a : Int[] = launch add(4, 6)" +
+            "launch var a : Int[] = add(4, 6)" +
             "fun add (a: Int, b: Int): Int[] { return [a, b] } ",
             "Function must be declared before launching the thread"
+        );
+
+        failureInputWith(
+            "launch add(4, 6)" +
+                "fun add (a: Int, b: Int): Int[] { return [a, b] } ",
+            "Function must be declared before launching the thread"
+        );
+
+        failureInputWith("launch var a : Int = 5",
+            "The thread must launch a function"
         );
     }
 

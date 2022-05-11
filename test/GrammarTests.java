@@ -185,7 +185,6 @@ public class GrammarTests extends AutumnTestFixture {
 
         //failure("var x : Int = launch print(3)"); // test passes, but it shouldn't
 
-        //failure("launch a[3]"); // test passes, but it shouldn't
         failure("launch {var x: String = '3'}");
     }
 
