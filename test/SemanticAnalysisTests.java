@@ -383,7 +383,7 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
 
         successInput(
             "fun add (a: Int, b: Int): Int { return a + b } " +
-            "var c : Int = launch add(1, 3)" +
+            "launch var c : Int = add(1, 3)" +
             "wait(c)"
         );
 

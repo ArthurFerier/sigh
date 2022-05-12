@@ -331,33 +331,39 @@ public final class InterpreterTests extends TestFixture {
 
         long start = System.currentTimeMillis();
         check(
-            "fun addUpTo1000 (a: Int): Int { while a < 1000000 { a = a + 1 } return a } " +
-                "launch addUpTo1000(1)" +
-                "addUpTo1000(1)",
+            "fun addUpTo1000000 (a: Int): Int { while a < 1000000 { a = a + 1 } return a } " +
+                "launch addUpTo1000000(1)" +
+                "addUpTo1000000(1)",
             null);
         long end = System.currentTimeMillis();
         long timeElapsedWithLaunch = end - start; // in milliseconds
 
         start = System.currentTimeMillis();
         check(
-            "fun addUpTo1000 (a: Int): Int { while a < 1000000 { a = a + 1 } return a } " +
-                "addUpTo1000(1)" +
-                "addUpTo1000(1)",
+            "fun addUpTo1000000 (a: Int): Int { while a < 1000000 { a = a + 1 } return a } " +
+                "addUpTo1000000(1)" +
+                "addUpTo1000000(1)",
             null);
         end = System.currentTimeMillis();
         long timeElapsedNoLaunch = end - start; // in milliseconds
-        System.out.println(timeElapsedWithLaunch);
-        System.out.println(timeElapsedNoLaunch);
-        assertTrue(timeElapsedWithLaunch * 1.7 <= timeElapsedNoLaunch);
+        assertTrue(timeElapsedWithLaunch * 1.5 <= timeElapsedNoLaunch);
 
     }
 
     @Test
-    public void returnLaunch () {
+    public void testWait () {
         rule = grammar.root;
         check(
             "fun addUpTo1000 (a: Int): Int { while a < 10000 { a = a + 1 } return a } " +
-                "var a : Int = launch addUpTo1000(1)",
+                "launch var b : Int = addUpTo1000(1)" +
+                "wait(b)" +
+                "return b",
+            10000L);
+
+        check(
+            "fun addUpTo100000 (a: Int): Int { while a < 100000 { a = a + 1 } return a } " +
+                "launch var b : Int = addUpTo100000(1)" +
+                "return b",
             null);
     }
 
@@ -449,27 +455,49 @@ public final class InterpreterTests extends TestFixture {
     // ---------------------------------------------------------------------------------------------
 
     @Test public void testProtect() {
-        check("var threadedVar: Int = 0\n" +
-            "fun add1000() {\n" +
-            "        protect : {\n" +
-            "            var i: Int = 0\n" +
-            "            while i < 1000 {\n" +
-            "                threadedVar = threadedVar+1\n" +
-            "                i = i +1\n" +
-            "            }\n" +
-            "        }\n" +
-            "}\n" +
-            "launch add1000()\n" +
-            "launch add1000()\n" +
-            "launch add1000()\n" +
-            "launch add1000()\n" +
-            "\n" +
-            "var a: Int = 0\n" +
-            "while a < 100000 {\n" +
-            "    a = a +1\n" +
-            "}\n" +
-            "print(\"threadVar: \" + threadedVar)\n" +
-            "\n", null, "threadVar: 4000\n");
+        rule = grammar.root;
+
+        check("var threadedVar: Int = 0" +
+            "fun add1000() {" +
+            "            var i: Int = 0" +
+            "            while i < 1000 {" +
+            "                protect : {" +
+            "                   threadedVar = threadedVar+1" +
+            "                }" +
+            "                i = i + 1" +
+            "            }" +
+            "}" +
+            "launch add1000()" +
+            "launch add1000()" +
+            "launch add1000()" +
+            "launch add1000()" +
+            "var a: Int = 0" +
+            "while a < 100000 {" +
+            "    a = a +1" +
+            "}" +
+            "print(\"threadVar: \" + threadedVar)",
+            null, "threadVar: 4000\n");
+
+
+        check("var threadedVar: Int = 0" +
+                "fun add1000() {" +
+                "        var i: Int = 0" +
+                "        while i < 1000 {" +
+                "            threadedVar = threadedVar+1" +
+                "            i = i +1" +
+                "        }" +
+                "}" +
+                "launch add1000()" +
+                "launch add1000()" +
+                "launch add1000()" +
+                "launch add1000()" +
+                "var a: Int = 0" +
+                "while a < 100000 {" +
+                "    a = a +1" +
+                "}" +
+                "var boolean : Bool = threadedVar < 4000" +
+                "print(\"\" + boolean)",
+            null, "true\n");
     }
 
 

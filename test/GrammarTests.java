@@ -195,14 +195,14 @@ public class GrammarTests extends AutumnTestFixture {
     @Test public void testProtect() {
         rule = grammar.statement;
 
-        successExpect("protect: {\n" +
-            "print(1)}", new ProtectBlockNode(null,
-            new BlockNode(null, asList(
-                new ExpressionStatementNode(null,  new FunCallNode(null,
-                    new ReferenceNode(null, "print"), asList(intlit(1)))
-                )
-            )
-        ), new ReentrantLock()));
+        successExpect("protect: {" +
+            "print(1)}",
+            new ProtectBlockNode(null,
+                new BlockNode(null, asList(
+                    new ExpressionStatementNode(null,
+                        new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1))))
+                )), new ReentrantLock()
+            ));
     }
 
     // ---------------------------------------------------------------------------------------------
