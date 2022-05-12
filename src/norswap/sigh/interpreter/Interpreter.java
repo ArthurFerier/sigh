@@ -708,12 +708,13 @@ public final class Interpreter
     }
 
     private Object launchCall(LaunchNode node) {
+        /*
         LaunchInterpreter launchInterpreter = new LaunchInterpreter(node.funCall, node.varDeclaration);
         try {
             executorService.execute(launchInterpreter);
         } catch (Exception e) {
             System.out.println("thread didn't run correctly");
-        }
+        }*/
         return VoidType.INSTANCE;
     }
 

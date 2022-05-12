@@ -251,7 +251,7 @@ public class SighGrammar extends Grammar
 
     public rule var_decl_launch =
         seq(_launch, var_decl)
-            .push($ -> new LaunchNode($.span(), $.$[0]));
+            .push($ -> new LaunchStateNode($.span(), $.$[0]));
 
 
     public rule parameter =

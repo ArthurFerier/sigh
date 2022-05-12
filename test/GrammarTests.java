@@ -166,7 +166,7 @@ public class GrammarTests extends AutumnTestFixture {
 
 
         successExpect("launch var x: String = print(1)",
-            new LaunchNode(null,
+            new LaunchStateNode(null,
                 new VarDeclarationNode(null, "x", new SimpleTypeNode(null, "String"),
                     new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))
                 )
