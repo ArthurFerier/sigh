@@ -72,6 +72,7 @@ public final class Interpreter
         visitor.register(ArrayAccessNode.class,          this::arrayAccess);
         visitor.register(FunCallNode.class,              this::funCall);
         visitor.register(LaunchNode.class,               this::launchCall);
+        visitor.register(LaunchStateNode.class,          this::launchStateCall);
         visitor.register(UnaryExpressionNode.class,      this::unaryExpression);
         visitor.register(BinaryExpressionNode.class,     this::binaryExpression);
         visitor.register(ProtectBlockNode.class,         this::protectedBlock);
@@ -697,24 +698,30 @@ public final class Interpreter
             interpreter2.storage = storage;
             if (funcall == null) {
                 Object result = interpreter2.interpret(varDecl);
-                Scope scope = reactor.get(varDecl, "scope");
-                assign(scope, varDecl.name, get(varDecl.initializer), reactor.get(varDecl, "type"));
+
             } else {
                 interpreter2.interpret(funcall);
             }
-
-
         }
     }
 
     private Object launchCall(LaunchNode node) {
-        /*
-        LaunchInterpreter launchInterpreter = new LaunchInterpreter(node.funCall, node.varDeclaration);
+        LaunchInterpreter launchInterpreter = new LaunchInterpreter(node.funCall, null);
         try {
             executorService.execute(launchInterpreter);
         } catch (Exception e) {
             System.out.println("thread didn't run correctly");
-        }*/
+        }
+        return VoidType.INSTANCE;
+    }
+
+    private Object launchStateCall(LaunchStateNode node) {
+        LaunchInterpreter launchInterpreter = new LaunchInterpreter(null, node.varDeclaration);
+        try {
+            executorService.execute(launchInterpreter);
+        } catch (Exception e) {
+            System.out.println("thread didn't run correctly");
+        }
         return VoidType.INSTANCE;
     }
 
@@ -749,7 +756,8 @@ public final class Interpreter
                 }*/
                 // if variable is not void anymore
                 try {
-                    rootStorage.get(rootScope, args[0].toString());
+                    String variable = args[1].toString();
+                    rootStorage.get(rootScope, variable);
                     return null;
                 } catch (Exception ignored) {
                 }

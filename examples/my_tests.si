@@ -15,6 +15,11 @@ fun add1000(): Int {
 
 
 launch var returned : Int = add1000()
+launch var returned2 : Int = add1000()
 
-print("bonjour")
+wait(returned)
+wait(returned2)
+
 print(""+returned)
+print(""+returned2)
+print(""+threadedVar)
