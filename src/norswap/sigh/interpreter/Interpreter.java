@@ -6,11 +6,7 @@ import norswap.sigh.scopes.DeclarationKind;
 import norswap.sigh.scopes.RootScope;
 import norswap.sigh.scopes.Scope;
 import norswap.sigh.scopes.SyntheticDeclarationNode;
-import norswap.sigh.types.ArrayType;
-import norswap.sigh.types.FloatType;
-import norswap.sigh.types.IntType;
-import norswap.sigh.types.StringType;
-import norswap.sigh.types.Type;
+import norswap.sigh.types.*;
 import norswap.uranium.Reactor;
 import norswap.utils.Util;
 import norswap.utils.exceptions.Exceptions;
@@ -76,6 +72,7 @@ public final class Interpreter
         visitor.register(ArrayAccessNode.class,          this::arrayAccess);
         visitor.register(FunCallNode.class,              this::funCall);
         visitor.register(LaunchNode.class,               this::launchCall);
+        visitor.register(LaunchStateNode.class,          this::launchStateCall);
         visitor.register(UnaryExpressionNode.class,      this::unaryExpression);
         visitor.register(BinaryExpressionNode.class,     this::binaryExpression);
         visitor.register(ProtectBlockNode.class,         this::protectedBlock);
@@ -686,10 +683,11 @@ public final class Interpreter
     private class LaunchInterpreter implements Runnable {
 
         FunCallNode funcall;
-        Object returnObject = null;
+        VarDeclarationNode varDecl;
 
-        public LaunchInterpreter(FunCallNode funcall) {
+        public LaunchInterpreter (FunCallNode funcall, VarDeclarationNode varDecl) {
             this.funcall = funcall;
+            this.varDecl = varDecl;
         }
 
         @Override
@@ -698,23 +696,33 @@ public final class Interpreter
             //interpreter2.rootScope = rootScope;
             interpreter2.rootStorage = rootStorage;
             interpreter2.storage = storage;
-            returnObject = interpreter2.interpret(funcall);
-            // todo : assign the object to the real return of the function
-            // todo : see to which variable the return is attached to
-            int a = 48;
+            if (funcall == null) {
+                Object result = interpreter2.interpret(varDecl);
+
+            } else {
+                interpreter2.interpret(funcall);
+            }
         }
     }
 
-    private Object launchCall(LaunchNode launchNode) {
-        LaunchInterpreter launchInterpreter = new LaunchInterpreter(launchNode.funCall);
-
+    private Object launchCall(LaunchNode node) {
+        LaunchInterpreter launchInterpreter = new LaunchInterpreter(node.funCall, null);
         try {
             executorService.execute(launchInterpreter);
         } catch (Exception e) {
             System.out.println("thread didn't run correctly");
         }
+        return VoidType.INSTANCE;
+    }
 
-        return launchInterpreter;
+    private Object launchStateCall(LaunchStateNode node) {
+        LaunchInterpreter launchInterpreter = new LaunchInterpreter(null, node.varDeclaration);
+        try {
+            executorService.execute(launchInterpreter);
+        } catch (Exception e) {
+            System.out.println("thread didn't run correctly");
+        }
+        return VoidType.INSTANCE;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -733,6 +741,7 @@ public final class Interpreter
                 } catch (Exception e) {
                     System.out.println("problem with waiting");
                 }
+                /*
                 if (((LaunchInterpreter) args[0]).returnObject != null) {
                     //return ((LaunchInterpreter) args[0]).returnObject;
                     Object returnObject2 = ((LaunchInterpreter) args[0]).returnObject;
@@ -744,6 +753,13 @@ public final class Interpreter
                         int a = 487;
                     }
                     return null;
+                }*/
+                // if variable is not void anymore
+                try {
+                    String variable = args[1].toString();
+                    rootStorage.get(rootScope, variable);
+                    return null;
+                } catch (Exception ignored) {
                 }
             }
         } else {

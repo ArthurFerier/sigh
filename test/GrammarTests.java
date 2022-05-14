@@ -155,12 +155,6 @@ public class GrammarTests extends AutumnTestFixture {
     @Test public void testLaunch() {
         rule = grammar.statement;
 
-        successExpect("launch print(1)", new ExpressionStatementNode(null,
-            new LaunchNode(null,
-                new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))
-            )
-        ));
-
 
         successExpect("return launch print(1)",
              new ReturnNode(null,
@@ -171,15 +165,29 @@ public class GrammarTests extends AutumnTestFixture {
         );
 
 
-        successExpect("var x: String = launch print(1)", new VarDeclarationNode(null,
-            "x", new SimpleTypeNode(null, "String"),
-            new LaunchNode(null,
-                new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))
+        successExpect("launch var x: String = print(1)",
+            new LaunchStateNode(null,
+                new VarDeclarationNode(null, "x", new SimpleTypeNode(null, "String"),
+                    new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))
+                )
             )
-        ));
+        );
 
-        failure("launch a[3]");
+        successExpect("launch print(1)",
+            new ExpressionStatementNode(null,
+                new LaunchNode(null,
+                    new FunCallNode(null,
+                        new ReferenceNode(null, "print"), asList(intlit(1))
+                    )
+                )
+            )
+        );
+
         failure("launch {var x: String = '3'}");
+        failure("launch struct Pair {\n" +
+            "    var a: Int\n" +
+            "    var b: Int\n" +
+            "}");
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -187,14 +195,14 @@ public class GrammarTests extends AutumnTestFixture {
     @Test public void testProtect() {
         rule = grammar.statement;
 
-        successExpect("protect: {\n" +
-            "print(1)}", new ProtectBlockNode(null,
-            new BlockNode(null, asList(
-                new ExpressionStatementNode(null,  new FunCallNode(null,
-                    new ReferenceNode(null, "print"), asList(intlit(1)))
-                )
-            )
-        ), new ReentrantLock()));
+        successExpect("protect: {" +
+            "print(1)}",
+            new ProtectBlockNode(null,
+                new BlockNode(null, asList(
+                    new ExpressionStatementNode(null,
+                        new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1))))
+                )), new ReentrantLock()
+            ));
     }
 
     // ---------------------------------------------------------------------------------------------

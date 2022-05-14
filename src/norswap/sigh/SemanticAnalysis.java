@@ -121,8 +121,8 @@ public final class SemanticAnalysis
         walker.register(FieldAccessNode.class,          PRE_VISIT,  analysis::fieldAccess);
         walker.register(ArrayAccessNode.class,          PRE_VISIT,  analysis::arrayAccess);
         walker.register(FunCallNode.class,              PRE_VISIT,  analysis::funCall);
-        // todo : post visit for return type ???!
         walker.register(LaunchNode.class,               PRE_VISIT,  analysis::launchCall);
+        walker.register(LaunchStateNode.class,          PRE_VISIT, analysis::launchStateCall);
         walker.register(UnaryExpressionNode.class,      PRE_VISIT,  analysis::unaryExpression);
         walker.register(BinaryExpressionNode.class,     PRE_VISIT,  analysis::binaryExpression);
         walker.register(AssignmentNode.class,           PRE_VISIT,  analysis::assignment);
@@ -449,7 +449,7 @@ public final class SemanticAnalysis
     // todo
     private void launchCall(LaunchNode node)
     {
-
+        /*
         String functionName = ((ReferenceNode)node.funCall.function).name; // str add
         DeclarationContext returnType = scope.lookup(functionName);
         if (returnType == null) {
@@ -494,7 +494,60 @@ public final class SemanticAnalysis
             }
         }
 
+        */
 
+        // case single non-returning function
+        String functionName = ((ReferenceNode) node.funCall.function).name; // str add
+        DeclarationContext returnType = scope.lookup(functionName);
+        if (returnType == null) {
+            //R.error(new SemanticError("Function must be declared before launching the thread", null, node.funCall));
+            R.rule(node, "type")
+                .by(r -> r.error("Function must be declared before launching the thread", node));
+        }
+
+        /*
+        if (node.funCall == null) {
+            // case expression
+            ExpressionNode funcall = (node.varDeclaration.initializer);
+            if (!(funcall instanceof FunCallNode)) {
+                R.rule(node, "type")
+                    .by(r -> r.error("The thread must launch a function", node));
+                return;
+            }
+            String functionName = ((ReferenceNode) ((FunCallNode) funcall).function).name;
+            DeclarationContext returnType = scope.lookup(functionName);
+            if (returnType == null) {
+                //R.error(new SemanticError("Function must be declared before launching the thread", null, node.funCall));
+                R.rule(node, "type")
+                    .by(r -> r.error("Function must be declared before launching the thread", node));
+            }
+        } else {
+            // case single non-returning function
+            String functionName = ((ReferenceNode) node.funCall.function).name; // str add
+            DeclarationContext returnType = scope.lookup(functionName);
+            if (returnType == null) {
+                //R.error(new SemanticError("Function must be declared before launching the thread", null, node.funCall));
+                R.rule(node, "type")
+                    .by(r -> r.error("Function must be declared before launching the thread", node));
+            }
+        }*/
+    }
+
+    private void launchStateCall(LaunchStateNode node) {
+        // case expression
+        ExpressionNode funcall = (node.varDeclaration.initializer);
+        if (!(funcall instanceof FunCallNode)) {
+            R.rule(node, "type")
+                .by(r -> r.error("The thread must launch a function", node));
+            return;
+        }
+        String functionName = ((ReferenceNode) ((FunCallNode) funcall).function).name;
+        DeclarationContext returnType = scope.lookup(functionName);
+        if (returnType == null) {
+            //R.error(new SemanticError("Function must be declared before launching the thread", null, node.funCall));
+            R.rule(node, "type")
+                .by(r -> r.error("Function must be declared before launching the thread", node));
+        }
     }
 
 
@@ -854,6 +907,13 @@ public final class SemanticAnalysis
 
     private void varDecl (VarDeclarationNode node)
     {
+
+        if (node.initializer instanceof LaunchNode) {
+            R.rule(node, "type")
+                .by(r -> r.error("Launch keyword cannot be after the var declaration", node));
+            return;
+        }
+
         this.inferenceContext = node;
 
         scope.declare(node.name, node);
