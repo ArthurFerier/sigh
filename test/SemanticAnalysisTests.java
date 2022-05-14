@@ -224,11 +224,11 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] + [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]]",
             "Trying to add Float[] with String[]");
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] + [1, 2]",
-            "Trying to add Array[] with Int[]");
+            "Trying to add Float[][] with Int[]");
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] + [1.0, 2.0]",
-            "Trying to add Array[] with Float[]");
+            "Trying to add Float[][] with Float[]");
         failureInputWith("return [[3, -1, 0], [1, 2, 3]] + [1.0, 2.6]",
-            "Trying to add Array[] with Float[]");
+            "Trying to add Int[][] with Float[]");
 
         // subtract
         failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] - [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
@@ -243,11 +243,11 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] - [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]]",
             "Trying to subtract Float[] with String[]");
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] - [1, 2]",
-            "Trying to subtract Array[] with Int[]");
+            "Trying to subtract Float[][] with Int[]");
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] - [1.0, 2.0]",
-            "Trying to subtract Array[] with Float[]");
+            "Trying to subtract Float[][] with Float[]");
         failureInputWith("return [[3, -1, 0], [1, 2, 3]] - [1.0, 2.6]",
-            "Trying to subtract Array[] with Float[]");
+            "Trying to subtract Int[][] with Float[]");
 
         // multiply
         failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] * [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
@@ -262,11 +262,11 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] * [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]]",
             "Trying to multiply Float[] with String[]");
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] * [1, 2]",
-            "Trying to multiply Array[] with Int[]");
+            "Trying to multiply Float[][] with Int[]");
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] * [1.0, 2.0]",
-            "Trying to multiply Array[] with Float[]");
+            "Trying to multiply Float[][] with Float[]");
         failureInputWith("return [[3, -1, 0], [1, 2, 3]] * [1.0, 2.6]",
-            "Trying to multiply Array[] with Float[]");
+            "Trying to multiply Int[][] with Float[]");
 
         // divide
         failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] / [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
@@ -281,11 +281,22 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] / [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]]",
             "Trying to divide Float[] with String[]");
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] / [1, 2]",
-            "Trying to divide Array[] with Int[]");
+            "Trying to divide Float[][] with Int[]");
         failureInputWith("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] / [1.0, 2.0]",
-            "Trying to divide Array[] with Float[]");
+            "Trying to divide Float[][] with Float[]");
         failureInputWith("return [[3, -1, 0], [1, 2, 3]] / [1.0, 2.6]",
-            "Trying to divide Array[] with Float[]");
+            "Trying to divide Int[][] with Float[]");
+    }
+
+
+    @Test public void testAssignationArrayMultipleDim() {
+        // multi dim with int left and float right
+        successInput("var a: Float[][] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]");
+
+        // big multi dim
+        successInput("var b: Float[][][][] = [[[[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]]] / [[[[-1, 1, 0], [15, -36, 789]]]]");
+
+        failureInput("var a: Float[] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]");
     }
 
     // ---------------------------------------------------------------------------------------------

@@ -632,9 +632,19 @@ public final class SemanticAnalysis
                 r.error(arithmeticError(node, "Bool", right), node);
             }
 
+        if (left instanceof ArrayType && right instanceof ArrayType) {
+            checkArrays((ArrayType) left, (ArrayType) right, r, node);
+        }
+        else if (right instanceof ArrayType)
+            if (!(left instanceof ArrayType))
+                r.error(arithmeticError(node, left, right), node);
+        else if (left instanceof ArrayType)
+            if (!(right instanceof ArrayType))
+                r.error(arithmeticError(node, left, right), node);
+        else
+            r.error("Should not reach here", node);
         // Array operation semantics
-        while (left instanceof ArrayType && right instanceof ArrayType) {
-            {
+        /*while (left instanceof ArrayType && right instanceof ArrayType) {
                 // no operations allowed on string arrays
                 if (((ArrayType) left).componentType == StringType.INSTANCE) {
                     r.error(arithmeticError(node, "String[]", right), node);
@@ -665,8 +675,6 @@ public final class SemanticAnalysis
                     && !(((ArrayType) right).componentType instanceof ArrayType)) {
                     r.error(arithmeticError(node, "Array[]", right), node);
                 }
-            }
-
 
             if (((ArrayType) left).componentType == IntType.INSTANCE) {
                 if (((ArrayType) right).componentType == IntType.INSTANCE) {
@@ -688,8 +696,80 @@ public final class SemanticAnalysis
             // normally : we arrive here if the two subtypes can only be ArrayType
             left = ((ArrayType) left).componentType;
             right = ((ArrayType) right).componentType;
-        }
+        }*/
+
+        // no operation allowed if left or right componentType = array and other isn't array
+
+        /*System.out.println(node.contents());
+        R.rule(node, "value")
+            .using(node.componentType, "value")
+            .by(r -> r.set(0, new ArrayType(r.get(0))));*/
     }
+
+
+    private static void checkArrays(ArrayType left, ArrayType right, Rule r, BinaryExpressionNode node) {
+        if (right.componentType == IntType.INSTANCE) {
+            if (left.componentType == IntType.INSTANCE || left.componentType == FloatType.INSTANCE) {
+                r.set(0, r.get(0));
+                return;
+            } else {
+                r.error(arithmeticError(node, left, right), node);
+                return;
+            }
+        }
+
+        if (left.componentType == IntType.INSTANCE) {
+            if (right.componentType == FloatType.INSTANCE) {
+                r.set(0, r.get(0));
+                return;
+            } else {
+                r.error(arithmeticError(node, left, right), node);
+                return;
+            }
+        }
+
+        if (right.componentType == FloatType.INSTANCE) {
+            if (left.componentType == FloatType.INSTANCE) {
+                r.set(0, r.get(0));
+                return;
+            } else {
+                r.error(arithmeticError(node, left, right), node);
+                return;
+            }
+        }
+
+        if (left.componentType == StringType.INSTANCE || right.componentType == StringType.INSTANCE) {
+            r.error(arithmeticError(node, left, right), node);
+            return;
+        }
+
+        // no operations allowed on bool arrays
+        if (left.componentType == BoolType.INSTANCE || right.componentType == BoolType.INSTANCE) {
+            r.error(arithmeticError(node, left, right), node);
+            return;
+        }
+
+        // no operations allowed on null arrays
+        if (left.componentType == NullType.INSTANCE || right.componentType == NullType.INSTANCE) {
+            r.error(arithmeticError(node, left, right), node);
+            return;
+        }
+
+
+        if (right.componentType instanceof ArrayType
+            && !(left.componentType instanceof ArrayType)) {
+            r.error(arithmeticError(node, left, right), node);
+            return;
+        }
+        if (left.componentType instanceof ArrayType
+            && !(right.componentType instanceof ArrayType)) {
+            r.error(arithmeticError(node, left, right), node);
+            return;
+        }
+
+        checkArrays((ArrayType) left.componentType, (ArrayType) right.componentType, r, node);
+    }
+
 
     // ---------------------------------------------------------------------------------------------
 
@@ -745,7 +825,6 @@ public final class SemanticAnalysis
         .by(r -> {
             Type left  = r.get(0);
             Type right = r.get(1);
-
             r.set(0, r.get(0)); // the type of the assignment is the left-side type
 
             if (node.left instanceof ReferenceNode
@@ -827,8 +906,8 @@ public final class SemanticAnalysis
             return true;
 
         if (a instanceof ArrayType) // TODO HERE!!
-            return b instanceof ArrayType
-                && isAssignableTo(((ArrayType)a).componentType, ((ArrayType)b).componentType);
+            return b instanceof ArrayType &&
+                isAssignableTo(((ArrayType)a).componentType, ((ArrayType)b).componentType);
 
         /*if (a instanceof ArrayType && b instanceof ArrayType) {
             a = (ArrayType) a;

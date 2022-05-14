@@ -67,7 +67,7 @@ var intVar2: Int = 5
 var intVar3: Int = intVar1 + intVar2
 print("intVar3 : " + intVar3)
 
-string = string + string
+//string = string + string
 
 var float2D: Float[][][] = [[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]]
 var float2DB: Int[][][] = [[[5, 17, 23] , [-4, -10, -17]]]
