@@ -138,7 +138,6 @@ public final class SemanticAnalysis
         walker.register(FieldDeclarationNode.class,     PRE_VISIT,  analysis::fieldDecl);
         walker.register(ParameterNode.class,            PRE_VISIT,  analysis::parameter);
         walker.register(FunDeclarationNode.class,       PRE_VISIT,  analysis::funDecl);
-        walker.register(ProtectBlockNode.class,         PRE_VISIT,  analysis::protectBlock);
         walker.register(StructDeclarationNode.class,    PRE_VISIT,  analysis::structDecl);
 
         walker.register(RootNode.class,                 POST_VISIT, analysis::popScope);
@@ -774,9 +773,16 @@ public final class SemanticAnalysis
         if (a instanceof IntType && b instanceof FloatType)
             return true;
 
-        if (a instanceof ArrayType)
+        if (a instanceof ArrayType) // TODO HERE!!
             return b instanceof ArrayType
                 && isAssignableTo(((ArrayType)a).componentType, ((ArrayType)b).componentType);
+
+        /*if (a instanceof ArrayType && b instanceof ArrayType) {
+            a = (ArrayType) a;
+            b = (ArrayType) b;
+            if (a.depth == b.depth)
+                return true;
+        }*/
 
         return a instanceof NullType && b.isReference() || a.equals(b);
     }
@@ -925,12 +931,6 @@ public final class SemanticAnalysis
         });
     }
 
-    // ---------------------------------------------------------------------------------------------
-
-    private void protectBlock(ProtectBlockNode node) {
-        // TODO
-        return;
-    }
 
     // ---------------------------------------------------------------------------------------------
 

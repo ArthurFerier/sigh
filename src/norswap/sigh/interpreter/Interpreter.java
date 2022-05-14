@@ -1,6 +1,5 @@
 package norswap.sigh.interpreter;
 
-import com.sun.jdi.IntegerType;
 import norswap.sigh.ast.*;
 import norswap.sigh.scopes.DeclarationContext;
 import norswap.sigh.scopes.DeclarationKind;
