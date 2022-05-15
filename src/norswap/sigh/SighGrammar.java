@@ -271,7 +271,7 @@ public class SighGrammar extends Grammar
 
     public rule protect_block =
         seq(_protect, COLON, block)
-            .push($ -> new ProtectBlockNode($.span(), $.$[0], new ReentrantLock()));
+            .push($ -> new ProtectBlockNode($.span(), $.$[0])); // , new ReentrantLock()
 
     public rule field_decl =
         seq(_var, identifier, COLON, type)

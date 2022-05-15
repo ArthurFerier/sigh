@@ -15,6 +15,7 @@ import norswap.utils.visitors.ValuedVisitor;
 //import org.graalvm.compiler.graph.spi.Canonicalizable.Binary;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static norswap.utils.Util.cast;
 import static norswap.utils.Vanilla.coIterate;
@@ -52,6 +53,7 @@ public final class Interpreter
     private ScopeStorage storage = null;
     private RootScope rootScope;
     private ScopeStorage rootStorage;
+    private ReentrantLock lock;
 
     private ExecutorService executorService;
 
@@ -97,6 +99,7 @@ public final class Interpreter
 
     public Object interpret (SighNode root) {
         try {
+            lock = new ReentrantLock();
             return run(root);
         } catch (PassthroughException e) {
             throw Exceptions.runtime(e.getCause());
@@ -641,9 +644,9 @@ public final class Interpreter
 
     private Object protectedBlock(ProtectBlockNode node) {
         try {
-            node.lock.lock();
+            lock.lock();//node.lock.lock();
             get(node.protectedBlock);
-            node.lock.unlock();
+            lock.unlock();//node.lock.unlock();
         }
         catch (Return r) {
             return r.value;
@@ -743,7 +746,6 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
-    // TODO : protect() and relax() are other builtin functions (not anymore)
     private Object builtin (String name, Object[] args)
     {
         if (Objects.equals(name, "print")) {
