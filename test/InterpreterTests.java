@@ -487,26 +487,31 @@ public final class InterpreterTests extends TestFixture {
     @Test public void testProtect() {
         rule = grammar.root;
 
-        check("var threadedVar: Int = 0" +
-            "fun add1000() {" +
-            "            var i: Int = 0" +
-            "            while i < 1000 {" +
-            "                protect : {" +
-            "                   threadedVar = threadedVar+1" +
-            "                }" +
-            "                i = i + 1" +
-            "            }" +
-            "}" +
-            "launch add1000()" +
-            "launch add1000()" +
-            "launch add1000()" +
-            "launch add1000()" +
-            "var a: Int = 0" +
-            "while a < 100000 {" +
-            "    a = a +1" +
-            "}" +
-            "print(\"threadVar: \" + threadedVar)",
-            null, "threadVar: 4000\n");
+        check("var threadedVar: Int = 0\n" +
+                "\n" +
+                "fun add1000(): Int {\n" +
+                "        while  threadedVar < 1000 {\n" +
+                "            protect : {\n" +
+                "                if (threadedVar < 1000) {\n" +
+                "                    threadedVar = threadedVar + 1\n" +
+                "                }\n" +
+                "            }\n" +
+                "        }\n" +
+                "        return 1\n" +
+                "}\n" +
+                "\n" +
+                "launch var returned : Int = add1000()\n" +
+                "launch var returned2 : Int = add1000()\n" +
+                "launch var returned3 : Int = add1000()\n" +
+                "launch var returned4 : Int = add1000()\n" +
+                "\n" +
+                "wait(returned)\n" +
+                "wait(returned2)\n" +
+                "wait(returned3)\n" +
+                "wait(returned4)\n" +
+                "\n" +
+                "print(\"ThreadedVar : \" + threadedVar)",
+            null, "ThreadedVar : 1000\n");
 
 
         check("var threadedVar: Int = 0" +

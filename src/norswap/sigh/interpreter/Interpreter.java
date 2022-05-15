@@ -318,16 +318,18 @@ public final class Interpreter
     private Object multiplyMatricesCell(Object[][] firstMatrix, Object[][] secondMatrix, int row, int col) {
         double cell = 0.0;
         for (int i = 0; i < secondMatrix.length; i++) {
-            if (firstMatrix[row][i] instanceof Double)
+            if (firstMatrix[row][i] instanceof Double) {
                 if (secondMatrix[i][col] instanceof Double)
                     cell += (Double) firstMatrix[row][i] * (Double) secondMatrix[i][col];
-                if (secondMatrix[i][col] instanceof Long)
+                else if (secondMatrix[i][col] instanceof Long)
                     cell += (Double) firstMatrix[row][i] * ((Long) secondMatrix[i][col]).doubleValue();
-            if (firstMatrix[row][i] instanceof Long)
+            }
+            else if (firstMatrix[row][i] instanceof Long) {
                 if (secondMatrix[i][col] instanceof Double)
                     cell += ((Long) firstMatrix[row][i]).doubleValue() * (Double) secondMatrix[i][col];
-                if (secondMatrix[i][col] instanceof Long)
+                else if (secondMatrix[i][col] instanceof Long)
                     cell += ((Long) firstMatrix[row][i]).doubleValue() * ((Long) secondMatrix[i][col]).doubleValue();
+            }
         }
         return cell;
     }
@@ -342,6 +344,12 @@ public final class Interpreter
         // verifying that the 2 arrays have the same length
         if (ar1.length != ar2.length) {
             throw new Error("The two arrays must have the same length: array1.length is " + ar1.length + " and array2.length is " + ar2.length);
+        }
+
+        /*if (ar1.length == 0)
+            return new Object[0];*/
+        if (ar1.length == 0) {
+            throw new Error("No operations allowed on empty arrays"); // TODO, changer
         }
 
         Object[] res = new Object[ar1.length];

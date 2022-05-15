@@ -1,29 +1,25 @@
 var threadedVar: Int = 0
 
-var i: Int = 0
 fun add1000(): Int {
-            while i < 10000 {
-                protect : {
-                    i = i + 1
-                    threadedVar = threadedVar+1
+        while  threadedVar < 1000 {
+            protect : {
+                if (threadedVar < 1000) {
+                    threadedVar = threadedVar + 1
                 }
             }
+        }
         return 1
 }
 
-var float2D: Float[][][] = [[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]]
-var float2DB: Int[][][] = [[[5, 17, 23] , [-4, -10, -17]]]
-var sum2D: Float[][][] = float2D * float2DB
-print("sum2D[0] = " + sum2D[0])
-print("sum2D[1] = " + sum2D[1])
-
-
 launch var returned : Int = add1000()
 launch var returned2 : Int = add1000()
+launch var returned3 : Int = add1000()
+launch var returned4 : Int = add1000()
 
 wait(returned)
 wait(returned2)
+wait(returned3)
+wait(returned4)
 
-print(""+returned)
-print(""+returned2)
-print(""+threadedVar)
+print("ThreadedVar : " + threadedVar)
+

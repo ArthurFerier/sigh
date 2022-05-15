@@ -76,11 +76,12 @@ print("sum2D[0] = " + sum2D[0])
 print("sum2D[1] = " + sum2D[1])
 
 var mat1: Float[][] = [[1.0], [2.0], [3.0]]
-var mat2: Bool[][] = [[true, false, false]]
+var mat2: Int[][] = [[1, 2, 3]]
 var result: Float[][] = mat2 @ mat1
 print(""+result)
 
 var a1: Int[] = [1, 2, 3]
 var a2: Int[] = [1, 2, 3]
 var res: Float[] = a1 + a2
-print("" + res)
+var test: Float[] = [] + []
+print("" + test)

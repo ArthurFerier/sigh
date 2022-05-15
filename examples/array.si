@@ -1,17 +1,37 @@
+// Example of uses of the new Array programming's features of Sigh
 
-var a: Bool = true
-var b: Int = 5
-//var c: Int = a + b
+// 1D
+var a: Int[] = [1, 3, 5, 7]
+var b: Int[] = [2, 4, 6, 8]
+var c: Int[] = a + b
+print("Sum 1D : "+ c)
+var c: Int[] = a * b
+print("Multiplication 1D : "+ c)
+var c: Int[] = a - b
+print("Subtraction 1D : "+ c)
+var c: Int[] = b / a
+print("Division 1D : "+ c)
 
-var arr: Float[][] = [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]
-var arr2: Float[][] = [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]
-var arr3: Float[][] = arr + arr2
+// Multiple dimensions with Int and Float
+var a: Float[][][] = [[[15.0, 5.3], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]]
+var b: Int[][][] = [[[15, 5], [14, 5, 7]], [[5, 17, 23] , [-4, -10, -17]]]
+var c: Float[][][] = a + b
+print("Sum 3D : "+ c)
+var c: Float[][][] = a * b
+print("Multiplication 3D : "+ c)
+var c: Float[][][] = a - b
+print("Subtraction 3D : "+ c)
+var c: Float[][][] = b / a
+print("Division 3D : "+ c)
 
-var test: Float[][][] = [[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]] / [[[14.0, 5.0, 7.0], [14.0, 8.0, 7.0]], [[5.0, 17.0, 9.0] , [-6.0, 10.0, -23.0]]]
-print("TEST: "+test)
-print("TEST: "+test[1])
+// Matricial product
+var mat1: Int[][] = [[1, 2, 3]]
+var mat2: Float[][] = [[1.0], [2.0], [3.0]]
+var result: Float[][] = mat1 @ mat2
+print("Matricial product 1 : "+result)
 
-var float2D: Float[][][] = [[[15.0, 5.3, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]]
-var float2DB: Int[][][] = [[[15, 5, 7], [14, 5, 7]], [[5, 17, 23] , [-4, -10, -17]]]
-var sum2D: Float[][][] = float2D + float2DB
-print(""+sum2D[0])
+var mat1: Float[][] = [[1.0, 3.5, 4.2], [2.0, 0.0, -7.8], [3.0, 1.3, -3.2]]
+var mat2: Int[][] = [[6, 2, 3], [17, 14, 1], [1, -5, 0]]
+var result: Float[][] = mat1 @ mat2
+print("Matricial product 2 : "+result)
+
