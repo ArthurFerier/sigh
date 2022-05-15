@@ -209,6 +209,12 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         successInput("return [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]] / [[-1, 1, 0], [15, -36, 789]]");
         // big multi dim
         successInput("return [[[[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]]] / [[[[-1, 1, 0], [15, -36, 789]]]]");
+        // Matricial product
+        successInput("return [[1], [2], [3]] @ [[1, 2, 3]]");
+        successInput("return [[1], [2], [3]] @ [[1.0, 2.0, 3.0]]");
+        successInput("return [[1.0], [2.0], [3.0]] @ [[1, 2, 3]]");
+        successInput("return [[1.0], [2.0], [3.0]] @ [[1.0, 2.0, 3.0]]");
+
 
         // failures
         // add
@@ -286,18 +292,28 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
             "Trying to divide Float[][] with Float[]");
         failureInputWith("return [[3, -1, 0], [1, 2, 3]] / [1.0, 2.6]",
             "Trying to divide Int[][] with Float[]");
+
+        // Matricial product
+        failureInputWith("return [[1.0], [2.0], [3.0]] @ [[true, false, false]]",
+            "Trying to mat_product Float[] with Bool[]");
+        failureInputWith("return [[1.0], [2.0], [3.0]] @ [[\"oui\", \"oui\", \"oui\"]]",
+            "Trying to mat_product Float[] with String[]");
+        failureInputWith("return [[1.0], [2.0], [3.0]] @ [[null, null, null]]",
+            "Trying to mat_product Float[] with Null[]");
     }
 
 
     @Test public void testAssignationArrayMultipleDim() {
-        // multi dim with int left and float right
-        successInput("var a: Float[][] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]");
-
         // big multi dim
+        successInput("var a: Float[][] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]");
         successInput("var b: Float[][][][] = [[[[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]]] / [[[[-1, 1, 0], [15, -36, 789]]]]");
+        failureInput("var a: Float[] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]"); // TODO with error message
 
-        failureInput("var a: Float[] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]");
+        // matricial product
+        successInput("var result: Float[][] = [[1, 2, 3]] @ [[1.0], [2.0], [3.0]]");
+        failureInput("var result: Float[] = [[1, 2, 3]] @ [[1.0], [2.0], [3.0]]");
     }
+
 
     // ---------------------------------------------------------------------------------------------
 

@@ -283,7 +283,6 @@ public final class Interpreter
 
     // ---------------------------------------------------------------------------------------------
 
-    // TODO matricial product, we have a nullPointerException
     private Object matricialProduct (BinaryExpressionNode node) {
         Object[] ar1 = getNonNullArray(node.left);
         Object[] ar2 = getNonNullArray(node.right);
@@ -303,8 +302,8 @@ public final class Interpreter
         return multiplyMatrices(ar2DA, ar2DB);
     }
 
-    private Double[][] multiplyMatrices(Object[][] firstMatrix, Object[][] secondMatrix) {
-        Double[][] result = new Double[firstMatrix.length][secondMatrix[0].length];
+    private Object[][] multiplyMatrices(Object[][] firstMatrix, Object[][] secondMatrix) {
+        Object[][] result = new Double[firstMatrix.length][secondMatrix[0].length];
         Object o = firstMatrix[0][0];
 
         for (int row = 0; row < result.length; row++) {
@@ -316,10 +315,19 @@ public final class Interpreter
         return result;
     }
 
-    private Double multiplyMatricesCell(Object[][] firstMatrix, Object[][] secondMatrix, int row, int col) {
+    private Object multiplyMatricesCell(Object[][] firstMatrix, Object[][] secondMatrix, int row, int col) {
         double cell = 0.0;
         for (int i = 0; i < secondMatrix.length; i++) {
-            cell += (Double) firstMatrix[row][i] * (Double) secondMatrix[i][col];
+            if (firstMatrix[row][i] instanceof Double)
+                if (secondMatrix[i][col] instanceof Double)
+                    cell += (Double) firstMatrix[row][i] * (Double) secondMatrix[i][col];
+                if (secondMatrix[i][col] instanceof Long)
+                    cell += (Double) firstMatrix[row][i] * ((Long) secondMatrix[i][col]).doubleValue();
+            if (firstMatrix[row][i] instanceof Long)
+                if (secondMatrix[i][col] instanceof Double)
+                    cell += ((Long) firstMatrix[row][i]).doubleValue() * (Double) secondMatrix[i][col];
+                if (secondMatrix[i][col] instanceof Long)
+                    cell += ((Long) firstMatrix[row][i]).doubleValue() * ((Long) secondMatrix[i][col]).doubleValue();
         }
         return cell;
     }
