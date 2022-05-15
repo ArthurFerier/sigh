@@ -307,11 +307,13 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         // big multi dim
         successInput("var a: Float[][] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]");
         successInput("var b: Float[][][][] = [[[[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]]] / [[[[-1, 1, 0], [15, -36, 789]]]]");
-        failureInput("var a: Float[] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]"); // TODO with error message
+        failureInputWith("var a: Float[] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
+            "incompatible initializer type provided for variable `a`: expected Float[] but got Int[][]"); // TODO with error message
 
         // matricial product
         successInput("var result: Float[][] = [[1, 2, 3]] @ [[1.0], [2.0], [3.0]]");
-        failureInput("var result: Float[] = [[1, 2, 3]] @ [[1.0], [2.0], [3.0]]");
+        failureInputWith("var result: Float[] = [[1, 2, 3]] @ [[1.0], [2.0], [3.0]]",
+            "incompatible initializer type provided for variable `result`: expected Float[] but got Int[][]");
     }
 
 

@@ -912,12 +912,6 @@ public final class SemanticAnalysis
             return b instanceof ArrayType &&
                 isAssignableTo(((ArrayType)a).componentType, ((ArrayType)b).componentType);
 
-        /*if (a instanceof ArrayType && b instanceof ArrayType) {
-            a = (ArrayType) a;
-            b = (ArrayType) b;
-            if (a.depth == b.depth)
-                return true;
-        }*/
 
         return a instanceof NullType && b.isReference() || a.equals(b);
     }
@@ -1016,6 +1010,7 @@ public final class SemanticAnalysis
                     "incompatible initializer type provided for variable `%s`: expected %s but got %s",
                     node.name, expected, actual),
                     node.initializer);
+                //throw new Error(format("incompatible initializer type provided for variable `%s`: expected %s but got %s", node.name, expected, actual));
         });
     }
 

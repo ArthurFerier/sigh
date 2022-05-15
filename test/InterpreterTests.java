@@ -198,7 +198,7 @@ public final class InterpreterTests extends TestFixture {
             AssertionError.class);
         checkExpr("[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]] @ [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]",
             new Object[][] {{30.0, 36.0, 42.0}, {66.0, 81.0, 96.0}, {102.0, 126.0, 150.0}});
-        checkExpr("[[1.0, 2.0, 3.0]] @ [[4.0], [5.0], [6.0]]",
+        checkExpr("[[1.0, 2.0, 3.0]] @ [[4], [5], [6]]",
             new Object[][] {{32.0}});
     }
 

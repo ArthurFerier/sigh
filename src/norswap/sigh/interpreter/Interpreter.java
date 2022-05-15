@@ -53,9 +53,9 @@ public final class Interpreter
     private ScopeStorage storage = null;
     private RootScope rootScope;
     private ScopeStorage rootStorage;
-    private ReentrantLock lock;
 
     private ExecutorService executorService;
+    private ReentrantLock l;
 
     // ---------------------------------------------------------------------------------------------
 
@@ -99,7 +99,7 @@ public final class Interpreter
 
     public Object interpret (SighNode root) {
         try {
-            lock = new ReentrantLock();
+            l = new ReentrantLock();
             return run(root);
         } catch (PassthroughException e) {
             throw Exceptions.runtime(e.getCause());
@@ -644,9 +644,17 @@ public final class Interpreter
 
     private Object protectedBlock(ProtectBlockNode node) {
         try {
-            lock.lock();//node.lock.lock();
+            if (!node.locked) {  // Initialize the lock if not yet done
+                l.lock();
+                if (node.lock == null) {
+                    node.lock = new ReentrantLock();
+                    node.locked = true;
+                }
+                l.unlock();
+            }
+            node.lock.lock();
             get(node.protectedBlock);
-            lock.unlock();//node.lock.unlock();
+            node.lock.unlock();
         }
         catch (Return r) {
             return r.value;

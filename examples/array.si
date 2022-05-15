@@ -35,3 +35,5 @@ var mat2: Int[][] = [[6, 2, 3], [17, 14, 1], [1, -5, 0]]
 var result: Float[][] = mat1 @ mat2
 print("Matricial product 2 : "+result)
 
+var a: Float[] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]
+

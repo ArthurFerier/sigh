@@ -201,7 +201,7 @@ public class GrammarTests extends AutumnTestFixture {
                 new BlockNode(null, asList(
                     new ExpressionStatementNode(null,
                         new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1))))
-                )) //new ReentrantLock()
+                )), null //new ReentrantLock()
             ));
     }
 
