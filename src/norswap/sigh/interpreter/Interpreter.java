@@ -644,14 +644,6 @@ public final class Interpreter
 
     private Object protectedBlock(ProtectBlockNode node) {
         try {
-            if (!node.locked) {  // Initialize the lock if not yet done
-                l.lock();
-                if (node.lock == null) {
-                    node.lock = new ReentrantLock();
-                    node.locked = true;
-                }
-                l.unlock();
-            }
             node.lock.lock();
             get(node.protectedBlock);
             node.lock.unlock();
