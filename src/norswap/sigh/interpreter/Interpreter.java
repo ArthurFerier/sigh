@@ -712,12 +712,10 @@ public final class Interpreter
         @Override
         public void run () {
             Interpreter interpreter2 = new Interpreter(reactor);
-            //interpreter2.rootScope = rootScope;
             interpreter2.rootStorage = rootStorage;
             interpreter2.storage = storage;
             if (funcall == null) {
-                Object result = interpreter2.interpret(varDecl);
-
+                interpreter2.interpret(varDecl);
             } else {
                 interpreter2.interpret(funcall);
             }
@@ -754,32 +752,21 @@ public final class Interpreter
             return out;
         } else if (Objects.equals(name, "wait")) {
             while (true) {
+                // waiting 20 milliseconds to not overuse the main thread
                 try {
                     TimeUnit.MILLISECONDS.sleep(20);
                 } catch (Exception e) {
                     System.out.println("problem with waiting");
                 }
-                /*
-                if (((LaunchInterpreter) args[0]).returnObject != null) {
-                    //return ((LaunchInterpreter) args[0]).returnObject;
-                    Object returnObject2 = ((LaunchInterpreter) args[0]).returnObject;
-                    if (returnObject2.getClass() == Integer.class || returnObject2.getClass() == Long.class) {
-                        assert returnObject2 instanceof Long;
-                        long integerReturn = (Long) returnObject2;
-                        // now I have to put the updated variable in the variable back
-                        assign(rootScope, args[1].toString(), integerReturn, IntType.INSTANCE);
-                        int a = 487;
-                    }
-                    return null;
-                }*/
-                // if variable is not void anymore
                 try {
                     String variable = args[1].toString();
-                    Object valuesvar = rootStorage.get(rootScope, variable);
-                    if (valuesvar != null) {
+                    Object valueVar = rootStorage.get(rootScope, variable);
+                    if (valueVar != null) {
+                        // the variable is assigned, we can continue the execution of the main thread
                         return null;
                     }
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    System.out.println("problem while trying to retrieve the value of the var in the rootStorage");
                 }
             }
         } else {

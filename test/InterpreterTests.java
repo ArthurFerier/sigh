@@ -356,9 +356,11 @@ public final class InterpreterTests extends TestFixture {
     // ---------------------------------------------------------------------------------------------
 
     @Test
-    public void testLaunch () {
+    public void testLaunchSpeed () {
         rule = grammar.root;
 
+        // this tests verify that the execution really is concurrent,
+        // if not, the two programs should have the same execution time
         long start = System.currentTimeMillis();
         check(
             "fun addUpTo1000000 (a: Int): Int { while a < 1000000 { a = a + 1 } return a } " +
@@ -377,12 +379,125 @@ public final class InterpreterTests extends TestFixture {
         end = System.currentTimeMillis();
         long timeElapsedNoLaunch = end - start; // in milliseconds
         assertTrue(timeElapsedWithLaunch * 1.5 <= timeElapsedNoLaunch);
-
     }
+
+    @Test
+    public void testLaunchGlobalVariables () {
+        rule = grammar.root;
+
+        // checks that the thread correctly can set
+        // a global variable that exists outside the scope of the thread
+        check(
+            "var threadedVar: Int = 0" +
+                "fun add1000() {" +
+                "    var i : Int = 0" +
+                "    while  i < 1000 {" +
+                "        protect : {" +
+                "            threadedVar = threadedVar + 1" +
+                "        }" +
+                "        i = i + 1" +
+                "    }" +
+                "}" +
+                "launch add1000()" +
+                "var i : Int = 0" +
+                "while  i < 100000 {" +
+                "    i = i + 1" +
+                "}" +
+                "return print(\"\" + threadedVar)",
+                "1000"
+            );
+
+        // checks that the thread don't update the global variable if redifined in the thread scope
+        check(
+            "var threadedVar: Int = 0" +
+                "var i : Int = 0" +
+                "fun add1000() {" +
+                "    var i : Int = 0" +
+                "   while  i < 1000 {" +
+                "        protect : {" +
+                "            threadedVar = threadedVar + 1" +
+                "        }" +
+                "        i = i + 1" +
+                "    }" +
+                "}" +
+                "launch add1000()" +
+                "var a : Int = 0" +
+                "while  a < 100000 {" +
+                "    a = a + 1" +
+                "}" +
+                "return print(\"\" + i)",
+            "0"
+        );
+
+        // verify that a thread can call a funcion defined outside the scope of the threaded function
+        check(
+            "var threadedVar: Int = 0" +
+                "var i : Int = 0" +
+                "fun functionCore() {" +
+                "   var i : Int = 0" +
+                "   while  i < 1000 {" +
+                "        protect : {" +
+                "            threadedVar = threadedVar + 1" +
+                "        }" +
+                "        i = i + 1" +
+                "    }" +
+                "}" +
+                "fun add1000() {" +
+                "   functionCore()" +
+                "}" +
+                "launch add1000()" +
+                "var a : Int = 0" +
+                "while  a < 100000 {" +
+                "    a = a + 1" +
+                "}" +
+                "return print(\"\" + threadedVar)",
+            "1000"
+        );
+    }
+
+    @Test
+    public void testLaunchConcurrent () {
+
+        rule = grammar.root;
+
+        // test that can finish only if the program is concurrent (use of the threads)
+        check(
+            "var check : Bool = false " +
+                "var globalVar : Int = 0" +
+                "fun waitingVarCheckToUpdate() : Int {" +
+                "    while globalVar != 1000 { }" +
+                "    check = true" +
+                "    return 1" +
+                "}" +
+                "fun updateGlobalVar() : Int {" +
+                "    var i : Int = 0" +
+                "    while  i < 1000 {" +
+                "        globalVar = globalVar + 1" +
+                "        i = i + 1" +
+                "    }" +
+                "    return 1" +
+                "}" +
+                "launch var firstThread : Int = waitingVarCheckToUpdate()" +
+                "launch var secondThread : Int = updateGlobalVar()" +
+                "wait(firstThread)" +
+                "return print(\"\" + check)",
+            "true"
+        );
+    }
+
+    // ---------------------------------------------------------------------------------------------
 
     @Test
     public void testWait () {
         rule = grammar.root;
+
+        // checking that the wait function correctly wait for
+        // the variable to be initialized before continuing the main execution
+        check(
+            "fun addUpTo100000 (a: Int): Int { while a < 100000 { a = a + 1 } return a } " +
+                "launch var b : Int = addUpTo100000(1)" +
+                "return b",
+            null);
         check(
             "fun addUpTo1000 (a: Int): Int { while a < 10000 { a = a + 1 } return a } " +
                 "launch var b : Int = addUpTo1000(1)" +
@@ -390,11 +505,29 @@ public final class InterpreterTests extends TestFixture {
                 "return b",
             10000L);
 
+
+        // test with multiple waits, and in disorder
         check(
-            "fun addUpTo100000 (a: Int): Int { while a < 100000 { a = a + 1 } return a } " +
-                "launch var b : Int = addUpTo100000(1)" +
-                "return b",
-            null);
+            "var threadedVar: Int = 0" +
+                "fun add1000(): Int {" +
+                "        while  threadedVar < 1000 {" +
+                "            if (threadedVar < 1000) {" +
+                "                threadedVar = threadedVar + 1" +
+                "            }" +
+                "        }" +
+                "        return 1" +
+                "}" +
+                "launch var protect1: Int = add1000()" +
+                "launch var protect2 : Int = add1000()" +
+                "launch var protect3 : Int = add1000()" +
+                "launch var protect4 : Int = add1000()" +
+                "wait(protect3)" +
+                "wait(protect2)" +
+                "wait(protect4)" +
+                "wait(protect1)" +
+                "return print(\"\" + protect1 + protect2 + protect3 + protect4)",
+                "1111"
+        );
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -487,29 +620,25 @@ public final class InterpreterTests extends TestFixture {
     @Test public void testProtect() {
         rule = grammar.root;
 
-        check("var threadedVar: Int = 0\n" +
-                "\n" +
-                "fun add1000(): Int {\n" +
-                "        while  threadedVar < 1000 {\n" +
-                "            protect : {\n" +
-                "                if (threadedVar < 1000) {\n" +
-                "                    threadedVar = threadedVar + 1\n" +
-                "                }\n" +
-                "            }\n" +
-                "        }\n" +
-                "        return 1\n" +
-                "}\n" +
-                "\n" +
-                "launch var returned : Int = add1000()\n" +
-                "launch var returned2 : Int = add1000()\n" +
-                "launch var returned3 : Int = add1000()\n" +
-                "launch var returned4 : Int = add1000()\n" +
-                "\n" +
-                "wait(returned)\n" +
-                "wait(returned2)\n" +
-                "wait(returned3)\n" +
-                "wait(returned4)\n" +
-                "\n" +
+        check("var threadedVar: Int = 0" +
+                "fun add1000(): Int {" +
+                "        while  threadedVar < 1000 {" +
+                "            protect : {" +
+                "                if (threadedVar < 1000) {" +
+                "                    threadedVar = threadedVar + 1" +
+                "                }" +
+                "            }" +
+                "        }" +
+                "        return 1" +
+                "}" +
+                "launch var returned : Int = add1000()" +
+                "launch var returned2 : Int = add1000()" +
+                "launch var returned3 : Int = add1000()" +
+                "launch var returned4 : Int = add1000()" +
+                "wait(returned)" +
+                "wait(returned2)" +
+                "wait(returned3)" +
+                "wait(returned4)" +
                 "print(\"ThreadedVar : \" + threadedVar)",
             null, "ThreadedVar : 1000\n");
 
@@ -530,11 +659,10 @@ public final class InterpreterTests extends TestFixture {
                 "while a < 100000 {" +
                 "    a = a +1" +
                 "}" +
-                "var boolean : Bool = threadedVar < 1000" +
+                "var boolean : Bool = threadedVar < 4000" +
                 "print(\"\" + boolean)",
             null, "true\n");
     }
-
 
 
     // ---------------------------------------------------------------------------------------------
