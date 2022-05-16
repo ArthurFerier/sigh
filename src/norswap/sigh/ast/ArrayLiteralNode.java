@@ -12,6 +12,7 @@ public class ArrayLiteralNode extends ExpressionNode
     public ArrayLiteralNode (Span span, Object components) {
         super(span);
         this.components = Util.cast(components, List.class);
+        System.out.println(this.contents());
     }
 
     @Override public String contents ()

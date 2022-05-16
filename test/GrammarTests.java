@@ -87,9 +87,9 @@ public class GrammarTests extends AutumnTestFixture {
     @Test public void testArrayStructAccess () {
         rule = grammar.expression;
         successExpect("[1][0]", new ArrayAccessNode(null,
-            new ArrayLiteralNode(null, List.of(intlit(1))), intlit(0)));
+            new ArrayLiteralNode(null, asList(intlit(1))), intlit(0)));
         successExpect("[1].length", new FieldAccessNode(null,
-            new ArrayLiteralNode(null, List.of(intlit(1))), "length"));
+            new ArrayLiteralNode(null, asList(intlit(1))), "length"));
         successExpect("p.x", new FieldAccessNode(null, new ReferenceNode(null, "p"), "x"));
     }
 
@@ -101,7 +101,7 @@ public class GrammarTests extends AutumnTestFixture {
         successExpect("var x: Int = 1", new VarDeclarationNode(null,
             "x", new SimpleTypeNode(null, "Int"), intlit(1)));
 
-        successExpect("struct P {}", new StructDeclarationNode(null, "P", List.of()));
+        successExpect("struct P {}", new StructDeclarationNode(null, "P", asList()));
 
         successExpect("struct P { var x: Int; var y: Int }",
             new StructDeclarationNode(null, "P", asList(
@@ -110,9 +110,9 @@ public class GrammarTests extends AutumnTestFixture {
 
         successExpect("fun f (x: Int): Int { return 1 }",
             new FunDeclarationNode(null, "f",
-                List.of(new ParameterNode(null, "x", new SimpleTypeNode(null, "Int"))),
+                asList(new ParameterNode(null, "x", new SimpleTypeNode(null, "Int"))),
                 new SimpleTypeNode(null, "Int"),
-                new BlockNode(null, List.of(new ReturnNode(null, intlit(1))))));
+                new BlockNode(null, asList(new ReturnNode(null, intlit(1))))));
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -123,8 +123,8 @@ public class GrammarTests extends AutumnTestFixture {
         successExpect("return", new ReturnNode(null, null));
         successExpect("return 1", new ReturnNode(null, intlit(1)));
         successExpect("print(1)", new ExpressionStatementNode(null,
-            new FunCallNode(null, new ReferenceNode(null, "print"), List.of(intlit(1)))));
-        successExpect("{ return }", new BlockNode(null, List.of(new ReturnNode(null, null))));
+            new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1)))));
+        successExpect("{ return }", new BlockNode(null, asList(new ReturnNode(null, null))));
 
 
         successExpect("if true return 1 else return 2", new IfNode(null, new ReferenceNode(null, "true"),
@@ -140,7 +140,7 @@ public class GrammarTests extends AutumnTestFixture {
 
         successExpect("while 1 < 2 { return } ", new WhileNode(null,
             new BinaryExpressionNode(null, intlit(1), LOWER, intlit(2)),
-            new BlockNode(null, List.of(new ReturnNode(null, null)))));
+            new BlockNode(null, asList(new ReturnNode(null, null)))));
     }
 
     @Test
@@ -162,7 +162,7 @@ public class GrammarTests extends AutumnTestFixture {
         successExpect("return launch returnArg(1)",
              new ReturnNode(null,
                 new LaunchNode(null,
-                    new FunCallNode(null, new ReferenceNode(null, "returnArg"), List.of(intlit(1)))
+                    new FunCallNode(null, new ReferenceNode(null, "returnArg"), asList(intlit(1)))
                 )
             )
         );
@@ -171,7 +171,7 @@ public class GrammarTests extends AutumnTestFixture {
         successExpect("launch var x: Int = returnArg(1)",
             new LaunchStateNode(null,
                 new VarDeclarationNode(null, "x", new SimpleTypeNode(null, "Int"),
-                    new FunCallNode(null, new ReferenceNode(null, "returnArg"), List.of(intlit(1)))
+                    new FunCallNode(null, new ReferenceNode(null, "returnArg"), asList(intlit(1)))
                 )
             )
         );
@@ -180,7 +180,7 @@ public class GrammarTests extends AutumnTestFixture {
                 new VarDeclarationNode(null, "x", new SimpleTypeNode(null, "String"),
                     new FunCallNode(null,
                         new ReferenceNode(null, "returnArg"),
-                        List.of(new StringLiteralNode(null, "hello world"))
+                        asList(new StringLiteralNode(null, "hello world"))
                     )
                 )
             )
@@ -190,7 +190,7 @@ public class GrammarTests extends AutumnTestFixture {
                 new VarDeclarationNode(null, "x", new SimpleTypeNode(null, "Bool"),
                     new FunCallNode(null,
                         new ReferenceNode(null, "returnArg"),
-                        List.of(new ReferenceNode(null, "true"))
+                        asList(new ReferenceNode(null, "true"))
                     )
                 )
             )
@@ -201,7 +201,7 @@ public class GrammarTests extends AutumnTestFixture {
                     new ArrayTypeNode(null, new SimpleTypeNode(null, "Int")),
                     new FunCallNode(null,
                         new ReferenceNode(null, "returnArg"),
-                        List.of(new ArrayLiteralNode(null, asList(intlit(1), intlit(2), intlit(3))))
+                        asList(new ArrayLiteralNode(null, asList(intlit(1), intlit(2), intlit(3))))
                     )
                 )
             )
@@ -212,7 +212,7 @@ public class GrammarTests extends AutumnTestFixture {
             new ExpressionStatementNode(null,
                 new LaunchNode(null,
                     new FunCallNode(null,
-                        new ReferenceNode(null, "nonReturningFun"), List.of(intlit(1))
+                        new ReferenceNode(null, "nonReturningFun"), asList(intlit(1))
                     )
                 )
             )
@@ -236,9 +236,9 @@ public class GrammarTests extends AutumnTestFixture {
         successExpect("protect: {" +
             "print(1)}",
             new ProtectBlockNode(null,
-                new BlockNode(null, List.of(
+                new BlockNode(null, asList(
                     new ExpressionStatementNode(null,
-                        new FunCallNode(null, new ReferenceNode(null, "print"), List.of(intlit(1))))
+                        new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1))))
                 )), null //new ReentrantLock()
             ));
     }
@@ -250,10 +250,10 @@ public class GrammarTests extends AutumnTestFixture {
 
         successExpect("[[1.0, 2.0, 3.0]] @ [[1.0, 2.0, 3.0]]",
             new BinaryExpressionNode(null,
-                new ArrayLiteralNode(null, List.of(new ArrayLiteralNode(null,
+                new ArrayLiteralNode(null, asList(new ArrayLiteralNode(null,
                     asList(floatlit(1.0), floatlit(2.0), floatlit(3.0))))),
                 MAT_PRODUCT,
-                new ArrayLiteralNode(null, List.of(new ArrayLiteralNode(null,
+                new ArrayLiteralNode(null, asList(new ArrayLiteralNode(null,
                     asList(floatlit(1.0), floatlit(2.0), floatlit(3.0))))))
             );
 
