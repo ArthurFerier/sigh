@@ -783,8 +783,10 @@ public final class Interpreter
                 // if variable is not void anymore
                 try {
                     String variable = args[1].toString();
-                    rootStorage.get(rootScope, variable);
-                    return null;
+                    Object valuesvar = rootStorage.get(rootScope, variable);
+                    if (valuesvar != null) {
+                        return null;
+                    }
                 } catch (Exception ignored) {
                 }
             }
