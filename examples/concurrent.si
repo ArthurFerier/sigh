@@ -1,0 +1,61 @@
+var threadedVar: Int = 0
+fun add1000() : Int{
+    var i : Int = 0
+    while  i < 1000 {
+        protect : {
+            threadedVar = threadedVar + 1
+        }
+        i = i + 1
+    }
+    return 1
+}
+
+var threadedVarNoProtect : Int = 0
+fun add1000NoProtect() : Int{
+    var i : Int = 0
+    while  i < 1000 {
+        threadedVarNoProtect = threadedVarNoProtect + 1
+        i = i + 1
+    }
+    return 1
+}
+
+fun checkThreadedVar(): Bool {
+    if threadedVar == 4000 {
+        return true
+    }
+    return false
+}
+fun checkThreadedVarNoProtect(): Bool {
+    if threadedVarNoProtect == 4000 {
+        return true
+    }
+    return false
+}
+
+launch var thread1 : Int = add1000()
+launch var thread2 : Int = add1000()
+launch var thread3 : Int = add1000()
+launch var thread4 : Int = add1000()
+
+print("is threadedVar == 4000 before wait ? : " + checkThreadedVar())
+
+wait(thread1)
+wait(thread2)
+wait(thread3)
+wait(thread4)
+
+print("is threadedVar == 4000 after wait ? : " + checkThreadedVar())
+
+launch var thread5 : Int = add1000NoProtect()
+launch var thread6 : Int = add1000NoProtect()
+launch var thread7 : Int = add1000NoProtect()
+launch var thread8 : Int = add1000NoProtect()
+
+wait(thread5)
+wait(thread6)
+wait(thread7)
+wait(thread8)
+
+print("is threadedVarNoProtect == 4000 ? : " + checkThreadedVarNoProtect())
+
