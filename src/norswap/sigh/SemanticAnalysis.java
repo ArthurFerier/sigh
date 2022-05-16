@@ -502,7 +502,7 @@ public final class SemanticAnalysis
         DeclarationContext returnType = scope.lookup(functionName);
         if (returnType == null) {
             //R.error(new SemanticError("Function must be declared before launching the thread", null, node.funCall));
-            R.rule(node, "type")
+            R.rule(node, "declaration")
                 .by(r -> r.error("Function must be declared before launching the thread", node));
         }
 

@@ -763,7 +763,7 @@ public final class Interpreter
         } else if (Objects.equals(name, "wait")) {
             while (true) {
                 try {
-                    java.util.concurrent.TimeUnit.SECONDS.sleep(2);
+                    TimeUnit.MILLISECONDS.sleep(20);
                 } catch (Exception e) {
                     System.out.println("problem with waiting");
                 }
