@@ -4,10 +4,7 @@ import norswap.sigh.ast.*;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.Arrays.asList;
 import static norswap.sigh.ast.BinaryOperator.*;
@@ -143,35 +140,24 @@ public class GrammarTests extends AutumnTestFixture {
             new BlockNode(null, List.of(new ReturnNode(null, null)))));
     }
 
-    @Test
-    public void testWait() {
-        rule = grammar.statement;
-        ReferenceNode ref = new ReferenceNode(null, "a");
-        ArrayList<ReferenceNode> a = new ArrayList<>();
-        a.add(ref);
-        successExpect("wait(a)", new ExpressionStatementNode(null,
-            new FunCallNode(null, new ReferenceNode(null, "wait"), a)));
-    }
-
     @Test public void testLaunch() {
         rule = grammar.statement;
 
         // returnArg is supposed to be a function that return the argument given
         // it is supposed to return an int when an integer is passed, a String when String ......
 
-        successExpect("return launch returnArg(1)",
-             new ReturnNode(null,
-                new LaunchNode(null,
-                    new FunCallNode(null, new ReferenceNode(null, "returnArg"), List.of(intlit(1)))
-                )
-            )
-        );
-
 
         successExpect("launch var x: Int = returnArg(1)",
             new LaunchStateNode(null,
                 new VarDeclarationNode(null, "x", new SimpleTypeNode(null, "Int"),
                     new FunCallNode(null, new ReferenceNode(null, "returnArg"), List.of(intlit(1)))
+                )
+            )
+        );
+        successExpect("launch var x: Float = returnArg(1.2)",
+            new LaunchStateNode(null,
+                new VarDeclarationNode(null, "x", new SimpleTypeNode(null, "Float"),
+                    new FunCallNode(null, new ReferenceNode(null, "returnArg"), List.of(floatlit(1.2)))
                 )
             )
         );
@@ -218,14 +204,29 @@ public class GrammarTests extends AutumnTestFixture {
             )
         );
 
-        // The LaunchNode can only be followed directly by a FuncallNode
-        failure("launch !returnTrue()");
+
         // the LaunchStateNode can only be followed directly by a VarDeclarationNode
         failure("launch {var x: String = '3'}");
+        // The LaunchNode can only be followed directly by a FuncallNode
+        failure("launch !returnTrue()");
         failure("launch struct Pair {" +
             "    var a: Int" +
             "    var b: Int" +
             "}");
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    public void testWait() {
+        // simple test, there wasn't anything to in the sighGrammar to implement the wait function
+        rule = grammar.statement;
+        ReferenceNode ref = new ReferenceNode(null, "a");
+        ArrayList<ReferenceNode> a = new ArrayList<>();
+        a.add(ref);
+        successExpect("wait(a)", new ExpressionStatementNode(null,
+            new FunCallNode(null, new ReferenceNode(null, "wait"), a)));
+
     }
 
     // ---------------------------------------------------------------------------------------------
