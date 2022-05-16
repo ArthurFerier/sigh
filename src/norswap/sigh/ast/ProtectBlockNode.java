@@ -8,13 +8,13 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class ProtectBlockNode extends StatementNode
 {
     public final BlockNode protectedBlock;
-    public final ReentrantLock lock;
+    public ReentrantLock lock = null;
 
     @SuppressWarnings("unchecked")
     public ProtectBlockNode (Span span, Object protectedBlock) {
         super(span);
         this.protectedBlock = Util.cast(protectedBlock, BlockNode.class);
-        this.lock = new ReentrantLock();
+        //this.lock = new ReentrantLock();
     }
 
     @Override public String contents ()

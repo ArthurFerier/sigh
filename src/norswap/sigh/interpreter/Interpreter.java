@@ -643,6 +643,13 @@ public final class Interpreter
     // ---------------------------------------------------------------------------------------------
 
     private Object protectedBlock(ProtectBlockNode node) {
+        if (node.lock == null) {
+            l.lock();
+            if (node.lock == null) {
+                node.lock = new ReentrantLock();
+            }
+            l.unlock();
+        }
         try {
             node.lock.lock();
             get(node.protectedBlock);
