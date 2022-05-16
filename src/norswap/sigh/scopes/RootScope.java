@@ -65,8 +65,8 @@ public final class RootScope extends Scope
         reactor.set(_null,  "type",       NullType.INSTANCE);
 
         reactor.set(print,  "type", new FunType(StringType.INSTANCE, StringType.INSTANCE));
-        // todo : make it for every type of var
-        reactor.set(wait,   "type", new FunType(VoidType.INSTANCE, IntType.INSTANCE));
+
+        reactor.set(wait,   "type", new FunType(VoidType.INSTANCE, FloatType.INSTANCE));
 
     }
 

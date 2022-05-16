@@ -411,12 +411,6 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
             "return add(4, 7)");
 
         successInput(
-            "fun add (a: Int, b: Int): Int { return a + b } " +
-            "launch var c : Int = add(1, 3)" +
-            "wait(c)"
-        );
-
-        successInput(
             "struct Point { var x: Int; var y: Int }" +
             "return $Point(1, 2)");
 
@@ -429,32 +423,23 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
     @Test
     public void testLaunch() {
 
-
         successInput(
                 "struct Point { var x: Int; var y: Int }" +
                 "fun returnStruct (a: Point): Point {return a}" +
                 "launch var a : Point = returnStruct($Point(2, 3))"
         );
-
-        // integer
         successInput(
             "fun add (a: Int, b: Int): Int { return a+b }" +
             "launch var c : Int = add(1, 2)"
         );
-
-        // String
         successInput(
             "fun add (): String { return \"hello\" }" +
             "launch var a : String = add()"
         );
-
-        // Bool
         successInput(
             "fun add (): Bool { return true }" +
             "launch var a : Bool = add()"
         );
-
-        // Float
         successInput(
             "fun add (): Float { return 1.2 }" +
             "launch var a : Float = add()"
@@ -465,7 +450,6 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
             "fun add (a: Int, b: Int): Int[] { return [a, b] } ",
             "Function must be declared before launching the thread"
         );
-
         failureInputWith(
             "launch add(4, 6)" +
                 "fun add (a: Int, b: Int): Int[] { return [a, b] } ",
@@ -475,6 +459,20 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
         failureInputWith("launch var a : Int = 5",
             "The thread must launch a function"
         );
+        failureInputWith("launch var a : String = \"hello\"",
+            "The thread must launch a function"
+        );
+        failureInputWith("launch var a : Float = 5.2",
+            "The thread must launch a function"
+        );failureInputWith("launch var a : Int[] = [5, 6, 7]",
+            "The thread must launch a function"
+        );
+        failureInput(
+            "struct Point { var x: Int; var y: Int }" +
+                "var a : Point = Point(1, 2)" +
+                "var p : Point = a"
+        );
+
 
         failureInputWith("fun add (): Float { return 1.2 }" +
             "var a : Float = launch add()",
@@ -484,9 +482,36 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
     @Test
     public void testWait() {
         successInput(
-            "var a : Int = 3" +
-            "wait(a)" +
-            "return a"
+            "fun add (a: Int, b: Int): Int { return a + b } " +
+            "launch var c : Int = add(1, 3)" +
+            "wait(c)"
+        );
+        successInput(
+            "fun add (a: Float, b: Float): Float { return a + b } " +
+                "launch var c : Float = add(1, 3.24)" +
+                "wait(c)"
+        );
+
+        // wait can only receive an argument of type Int or Float
+        failureInput(
+            "fun sendText (): String { return \"hello\" } " +
+                "launch var c : String = sendText()" +
+                "wait(c)"
+        );
+        failureInput(
+            "fun sendArr (): Int[] { return [1, 2, 3] } " +
+                "launch var c : Int[] = sendArr()" +
+                "wait(c)"
+        );
+        failureInput(
+            "fun sendArr (): String[] { return [\"hello\", \"world\"] } " +
+                "launch var c : String[] = sendArr()" +
+                "wait(c)"
+        );
+        failureInput(
+            "fun sendArr (): Float[] { return [1.2, 2.0, 3.25698] } " +
+                "launch var c : Float[] = sendArr()" +
+                "wait(c)"
         );
     }
 

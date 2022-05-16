@@ -447,111 +447,38 @@ public final class SemanticAnalysis
 
     // ---------------------------------------------------------------------------------------------
 
-    // todo
+    // case single non-returning function
     private void launchCall(LaunchNode node)
     {
-        /*
-        String functionName = ((ReferenceNode)node.funCall.function).name; // str add
-        DeclarationContext returnType = scope.lookup(functionName);
-        if (returnType == null) {
-            //R.error(new SemanticError("Function must be declared before launching the thread", null, node.funCall));
-            R.rule(node, "type")
-                .by(r -> r.error("Function must be declared before launching the thread", node));
-            return;
-        }
-        FunDeclarationNode declNode = (FunDeclarationNode) returnType.declaration;
-        if (declNode.returnType instanceof ArrayTypeNode) {
-            ArrayTypeNode typeArray = (ArrayTypeNode) declNode.returnType;
-            if (typeArray.contents().equals("Int[]")) {
-                R.set(node, "type", new ArrayType(IntType.INSTANCE));
-            } else if (typeArray.contents().equals("String[]")) {
-                R.set(node, "type", new ArrayType(StringType.INSTANCE));
-            } else if (typeArray.contents().equals("Bool[]")) {
-                R.set(node, "type", new ArrayType(BoolType.INSTANCE));
-            } else if (typeArray.contents().equals("Float[]")) {
-                R.set(node, "type", new ArrayType(FloatType.INSTANCE));
-            } else if (typeArray.contents().equals("Null[]")) {
-                R.set(node, "type", new ArrayType(NullType.INSTANCE));
-            }
-        }  else {
-            SimpleTypeNode typeNode = (SimpleTypeNode) declNode.returnType;
-            String type = typeNode.name;
-            if (Objects.equals(type, "String")) {
-                R.set(node, "type", StringType.INSTANCE);
-            } else if (Objects.equals(type, "Int")) {
-                R.set(node, "type", IntType.INSTANCE);
-            } else if (Objects.equals(type, "Bool")) {
-                R.set(node, "type", BoolType.INSTANCE);
-            } else if (Objects.equals(type, "Float")) {
-                R.set(node, "type", FloatType.INSTANCE);
-            } else if (Objects.equals(type, "Null")) {
-                R.set(node, "type", NullType.INSTANCE);
-            } else {
-                // case of a Struct
-                // todo : don't work with structures
-                ReferenceNode refNode = (ReferenceNode) node.funCall.function;
-                int a = 5;
-                R.set(node, "type", type);
-            }
-        }
-
-        */
-
-        // case single non-returning function
+        // simply checking if the function is already defined
         String functionName = ((ReferenceNode) node.funCall.function).name; // str add
         DeclarationContext returnType = scope.lookup(functionName);
         if (returnType == null) {
-            //R.error(new SemanticError("Function must be declared before launching the thread", null, node.funCall));
             R.rule(node, "declaration")
                 .by(r -> r.error("Function must be declared before launching the thread", node));
         }
-
-        /*
-        if (node.funCall == null) {
-            // case expression
-            ExpressionNode funcall = (node.varDeclaration.initializer);
-            if (!(funcall instanceof FunCallNode)) {
-                R.rule(node, "type")
-                    .by(r -> r.error("The thread must launch a function", node));
-                return;
-            }
-            String functionName = ((ReferenceNode) ((FunCallNode) funcall).function).name;
-            DeclarationContext returnType = scope.lookup(functionName);
-            if (returnType == null) {
-                //R.error(new SemanticError("Function must be declared before launching the thread", null, node.funCall));
-                R.rule(node, "type")
-                    .by(r -> r.error("Function must be declared before launching the thread", node));
-            }
-        } else {
-            // case single non-returning function
-            String functionName = ((ReferenceNode) node.funCall.function).name; // str add
-            DeclarationContext returnType = scope.lookup(functionName);
-            if (returnType == null) {
-                //R.error(new SemanticError("Function must be declared before launching the thread", null, node.funCall));
-                R.rule(node, "type")
-                    .by(r -> r.error("Function must be declared before launching the thread", node));
-            }
-        }*/
     }
 
-    private void protectBlock(ProtectBlockNode node) { return; }
-
+    // case expression
     private void launchStateCall(LaunchStateNode node) {
-        // case expression
+        // checking that the right part of the expression is a function call
         ExpressionNode funcall = (node.varDeclaration.initializer);
         if (!(funcall instanceof FunCallNode)) {
             R.rule(node, "type")
                 .by(r -> r.error("The thread must launch a function", node));
             return;
         }
+        //checking if the function is already defined
         String functionName = ((ReferenceNode) ((FunCallNode) funcall).function).name;
         DeclarationContext returnType = scope.lookup(functionName);
         if (returnType == null) {
             //R.error(new SemanticError("Function must be declared before launching the thread", null, node.funCall));
-            R.rule(node, "type")
+            R.rule(node, "declaration")
                 .by(r -> r.error("Function must be declared before launching the thread", node));
         }
     }
+
+    private void protectBlock(ProtectBlockNode node) { return; }
 
 
     // ---------------------------------------------------------------------------------------------
