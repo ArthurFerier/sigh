@@ -4,10 +4,6 @@ import norswap.sigh.ast.*;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.Arrays.asList;
 import static norswap.sigh.ast.BinaryOperator.*;
@@ -205,6 +201,9 @@ public class GrammarTests extends AutumnTestFixture {
         failure("launch {var x: String = '3'}");
         // The LaunchNode can only be followed directly by a FuncallNode
         failure("launch !returnTrue()");
+        failure("launch 3");
+        failure("launch a[7]");
+        failure("launch struct.a");
         failure("launch struct Pair {" +
             "    var a: Int" +
             "    var b: Int" +
@@ -215,7 +214,7 @@ public class GrammarTests extends AutumnTestFixture {
 
     @Test
     public void testWait() {
-        // simple test, there wasn't anything to in the sighGrammar to implement the wait function
+        // simple test, there wasn't anything to do in the sighGrammar to implement the wait function
         rule = grammar.statement;
         ReferenceNode ref = new ReferenceNode(null, "a");
         ArrayList<ReferenceNode> a = new ArrayList<>();
