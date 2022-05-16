@@ -530,7 +530,7 @@ public final class InterpreterTests extends TestFixture {
                 "while a < 100000 {" +
                 "    a = a +1" +
                 "}" +
-                "var boolean : Bool = threadedVar < 4000" +
+                "var boolean : Bool = threadedVar < 1000" +
                 "print(\"\" + boolean)",
             null, "true\n");
     }
