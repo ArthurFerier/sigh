@@ -460,6 +460,7 @@ public final class InterpreterTests extends TestFixture {
 
         rule = grammar.root;
 
+        // test that can finish only if the program is concurrent (use of the threads)
         check(
             "var check : Bool = false " +
                 "var globalVar : Int = 0" +
