@@ -122,7 +122,7 @@ public final class SemanticAnalysis
         walker.register(ArrayAccessNode.class,          PRE_VISIT,  analysis::arrayAccess);
         walker.register(FunCallNode.class,              PRE_VISIT,  analysis::funCall);
         walker.register(LaunchNode.class,               PRE_VISIT,  analysis::launchCall);
-        walker.register(ProtectBlockNode.class,         PRE_VISIT,  analysis::protectBlock);
+        walker.register(ProtectBlockNode.class,         PRE_VISIT,  node -> {});
         walker.register(LaunchStateNode.class,          PRE_VISIT, analysis::launchStateCall);
         walker.register(UnaryExpressionNode.class,      PRE_VISIT,  analysis::unaryExpression);
         walker.register(BinaryExpressionNode.class,     PRE_VISIT,  analysis::binaryExpression);
@@ -477,8 +477,6 @@ public final class SemanticAnalysis
                 .by(r -> r.error("Function must be declared before launching the thread", node));
         }
     }
-
-    private void protectBlock(ProtectBlockNode node) { return; }
 
 
     // ---------------------------------------------------------------------------------------------
