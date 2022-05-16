@@ -11,15 +11,35 @@ fun add1000(): Int {
         return 1
 }
 
-launch var returned : Int = add1000()
-launch var returned2 : Int = add1000()
-launch var returned3 : Int = add1000()
-launch var returned4 : Int = add1000()
+var threadedVar2: Int = 0
+fun add1000NoProtect(): Int {
+        while  threadedVar2 < 1000 {
 
-wait(returned)
-wait(returned2)
-wait(returned3)
-wait(returned4)
+                threadedVar2 = threadedVar2 + 1
+        }
+        return 1
+}
+
+launch var protect1: Int = add1000()
+launch var protect2 : Int = add1000()
+launch var protect3 : Int = add1000()
+launch var protect4 : Int = add1000()
+
+wait(protect1)
+wait(protect2)
+wait(protect3)
+wait(protect4)
+
+launch var noProtect : Int = add1000NoProtect()
+launch var noProtect1 : Int = add1000NoProtect()
+launch var noProtect2 : Int = add1000NoProtect()
+launch var noProtect3 : Int = add1000NoProtect()
+
+wait(noProtect)
+wait(noProtect1)
+wait(noProtect2)
+wait(noProtect3)
 
 print("ThreadedVar : " + threadedVar)
+print("ThreadedVar2 : " + threadedVar2)
 
