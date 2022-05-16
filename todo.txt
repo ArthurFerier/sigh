@@ -8,3 +8,15 @@ semantic for the wait : null type is the bottom type for everything
 semantic for the launch return : make it good for structs
 semantic for the wait : make it that it can take multiple sort of arguments
 (rootscope)
+
+
+
+todo rapport =>
+ - est-ce que je fais bien des erreurs personnalisées pour chaque nouvelle implém ?
+ - terminer les tests
+ - commenter le code
+ - faire un fichier concurrent.si
+ - rapport
+
+ - launch
+ - wait
