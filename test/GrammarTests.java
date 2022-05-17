@@ -142,11 +142,13 @@ public class GrammarTests extends AutumnTestFixture {
             new BlockNode(null, asList(new ReturnNode(null, null)))));
     }
 
+    /////////////////////////////////////// OUR TESTS //////////////////////////////////////////////
+
     @Test public void testLaunch() {
         rule = grammar.statement;
 
         // returnArg is supposed to be a function that return the argument given
-        // it is supposed to return an int when an integer is passed, a String when String ......
+        // it return an int when an integer is passed, a String when String ......
 
 
         successExpect("launch var x: Int = returnArg(1)",
@@ -217,14 +219,15 @@ public class GrammarTests extends AutumnTestFixture {
 
     @Test
     public void testWait() {
-        // simple test, there wasn't anything to do in the sighGrammar to implement the wait function
+        // simple test, there wasn't anything to do
+        // in the sighGrammar to implement the wait function
         rule = grammar.statement;
-        ReferenceNode ref = new ReferenceNode(null, "a");
+        ReferenceNode ref = new ReferenceNode(null, "variable");
         ArrayList<ReferenceNode> a = new ArrayList<>();
         a.add(ref);
-        successExpect("wait(a)", new ExpressionStatementNode(null,
-            new FunCallNode(null, new ReferenceNode(null, "wait"), a)));
-
+        successExpect("wait(variable)", new ExpressionStatementNode(null,
+            new FunCallNode(null, new ReferenceNode(null, "wait"), a))
+        );
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -233,13 +236,20 @@ public class GrammarTests extends AutumnTestFixture {
         rule = grammar.statement;
 
         successExpect("protect: {" +
-            "print(1)}",
+                "var x : Int = 1" +
+                "print(1)}",
             new ProtectBlockNode(null,
                 new BlockNode(null, asList(
+                    new VarDeclarationNode(null,
+                        "x", new SimpleTypeNode(null, "Int"), intlit(1)),
                     new ExpressionStatementNode(null,
-                        new FunCallNode(null, new ReferenceNode(null, "print"), asList(intlit(1))))
+                        new FunCallNode(null,
+                            new ReferenceNode(null, "print"), asList(intlit(1))
+                        )
+                    )
                 )) //new ReentrantLock()
-            ));
+            )
+        );
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -257,4 +267,6 @@ public class GrammarTests extends AutumnTestFixture {
             );
 
     }
+
+    // ---------------------------------------------------------------------------------------------
 }
