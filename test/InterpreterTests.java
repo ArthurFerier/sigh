@@ -165,99 +165,6 @@ public final class InterpreterTests extends TestFixture {
     // ---------------------------------------------------------------------------------------------
 
     @Test
-    public void testNumericArrayOp () {
-        // multiplication
-        checkExpr("[1, 2, 7] * [8, 5, 7]", new Object[]{8L, 10L, 49L});
-        checkExpr("[-1, 1, 0] * [3.2, -1.3658, 0.0]", new Object[]{-3.2, -1.3658, 0.0});
-        checkExpr("[3.2, -1.3658, 0.0] * [-1, 1, 0]", new Object[]{-3.2, -1.3658, 0.0});
-        checkExpr("[3.2, -1.3658, 0.0] * [0.0, 1.753, -1.654]", new Object[]{0.0, -2.3942474, -0.0});
-
-        // division
-        checkExpr("[1, 2, -12] / [8, 5, 7]", new Object[]{0L, 0L, -1L});
-        checkExpr("[-1, 1, 0] / [3.2, -1.3658, 0.001]", new Object[]{-0.3125, -0.732171621027969, 0.0});
-        checkExpr("[3.2, -1.3658, 21.3] / [-1, 1, 8963]", new Object[]{-3.2, -1.3658, 0.0023764364610063594});
-        checkExpr("[3.2, -1.3658, 0.0] / [0.01, 1.753, -1.654]", new Object[]{320.0, -0.7791215059897318, -0.0});
-
-        // addition
-        checkExpr("[1, 2, -12] + [8, 5, 7]", new Object[]{9L, 7L, -5L});
-        checkExpr("[-1, 1, 0] + [3.2, -1.3658, 0.001]", new Object[]{2.2, -0.3657999999999999, 0.001});
-        checkExpr("[3.2, -1.3658, 21.3] + [-1, 1, 8963]", new Object[]{2.2, -0.3657999999999999, 8984.3});
-        checkExpr("[3.2, -1.3658, 0.0] + [0.0, 1.753, -1.654]", new Object[]{3.2, 0.3872, -1.654});
-
-        // subtraction
-        checkExpr("[1, 2, -12] - [8, 5, 7]", new Object[]{-7L, -3L, -19L});
-        checkExpr("[-1, 1, 0] - [3.2, -1.3658, 0.001]", new Object[]{-4.2, 2.3658, -0.001});
-        checkExpr("[3.2, -1.3658, 21.3] - [-1, 1, 8963]", new Object[]{4.2, -2.3658, -8941.7});
-        checkExpr("[3.2, -1.3658, 0.0] - [0.0, 1.753, -1.654]", new Object[]{3.2, -3.1188, 1.654});
-    }
-
-    @Test
-    public void matricialProduct () {
-        // Matricial product
-        checkThrows("[[4.0, 5.0, 6.0], [7.0, 8.0, 9.0]] @ [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]",
-            AssertionError.class);
-        checkExpr("[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]] @ [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]",
-            new Object[][] {{30.0, 36.0, 42.0}, {66.0, 81.0, 96.0}, {102.0, 126.0, 150.0}});
-        checkExpr("[[1.0, 2.0, 3.0]] @ [[4], [5], [6]]",
-            new Object[][] {{32.0}});
-    }
-
-    @Test
-    public void multiDimArrayOperations () {
-        // Multi-dimensional arrays
-        checkExpr("[[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]] + " +
-                "[[[14.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]]",
-            new Object[][][]{{{29.0, 10.0, 14.0}, {28.0, 10.0, 14.0}}, {{10.0, 34.0, 46.0} , {-8.0, -20.0, -34.0}}});
-        checkExpr("[[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]] * " +
-                "[[[14.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]]",
-            new Object[][][]{{{210.0, 25.0, 49.0}, {196.0, 25.0, 49.0}}, {{25.0, 289.0, 529.0} , {16.0, 100.0, 289.0}}});
-        checkExpr("[[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]] - " +
-                "[[[18.0, 7.0, 1.0], [3.0, 2.0, 7.0]], [[5.0, 17.0, 15.0] , [4.0, -12.0, -18.0]]]",
-            new Object[][][]{{{-3.0, -2.0, 6.0}, {11.0, 3.0, 0.0}}, {{0.0, 0.0, 8.0} , {-8.0, 2.0, 1.0}}});
-        checkExpr("[[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]] / " +
-                "[[[14.0, 5.0, 7.0], [14.0, 8.0, 7.0]], [[5.0, 17.0, 9.0] , [-6.0, 10.0, -23.0]]]",
-            new Object[][][]{{{1.0714285714285714, 1.0, 1.0}, {1.0, 0.625, 1.0}}, {{1.0, 1.0, 2.5555555555555554}, {0.6666666666666666, -1.0, 0.7391304347826086}}});
-
-        // Corner cases
-
-        // Empty arrays
-        checkThrows("[[]] + [[]]", AssertionError.class);
-        checkThrows("[[[]]] - [[[]]]", AssertionError.class);
-        checkThrows("[[]] / [[]]", AssertionError.class);
-        checkThrows("[[[]]] * [[[]]]", AssertionError.class);
-
-        // Division by 0
-        checkExpr("[[-1.0, 1.0, 1.0], [3.0, 2.0, 8.0]] / [[3.0, -1.0, 0.0], [0.0, 1.0, 8.0]]",
-            new Object[][]{{-0.3333333333333333, -1.0, Double.POSITIVE_INFINITY}, {Double.POSITIVE_INFINITY, 2.0, 1.0}});
-
-    }
-
-    @Test
-    public void cornerCasesArrayOperation () {
-        // division by 0
-        checkThrows("[-1, 1, 1] / [3, -1, 0]", AssertionError.class);
-        checkExpr("[-1, 1, 1] / [3.0, -1.0, 0.0]", new Object[]{-0.3333333333333333, -1.0, Double.POSITIVE_INFINITY});
-        checkExpr("[-1.0, 1.0, 1.0] / [3.0, -1.0, 0.0]", new Object[]{-0.3333333333333333, -1.0, Double.POSITIVE_INFINITY});
-
-        // operation on two arrays of different length and null length
-        checkThrows("[-1, 1, 1] + [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
-        checkThrows("[-1, 1, 1, 13] + [3.0, -1.0, 0.0]", AssertionError.class);
-        checkThrows("[] + []", AssertionError.class);
-        checkThrows("[-1, 1, 1] - [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
-        checkThrows("[-1, 1, 1, 13] - [3.0, -1.0, 0.0]", AssertionError.class);
-        checkThrows("[] - []", AssertionError.class);
-        checkThrows("[-1, 1, 1] * [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
-        checkThrows("[-1, 1, 1, 13] * [3.0, -1.0, 0.0]", AssertionError.class);
-        checkThrows("[] * []", AssertionError.class);
-        checkThrows("[-1, 1, 1] / [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
-        checkThrows("[-1, 1, 1, 13] / [3.0, -1.0, 0.0]", AssertionError.class);
-        checkThrows("[] / []", AssertionError.class);
-    }
-
-
-    // ---------------------------------------------------------------------------------------------
-
-    @Test
     public void testOtherBinary () {
         checkExpr("true  && true",  true);
         checkExpr("true  || true",  true);
@@ -359,11 +266,102 @@ public final class InterpreterTests extends TestFixture {
     // ---------------------------------------------------------------------------------------------
 
     @Test
+    public void testArrayStructAccess () {
+        checkExpr("[1][0]", 1L);
+        checkExpr("[1.0][0]", 1d);
+        checkExpr("[1, 2][1]", 2L);
+
+        // TODO check that this fails (& maybe improve so that it generates a better message?)
+        // or change to make it legal (introduce a top type, and make it a top type array if thre
+        // is no inference context available)
+        // checkExpr("[].length", 0L);
+        checkExpr("[1].length", 1L);
+        checkExpr("[1, 2].length", 2L);
+
+        checkThrows("var array: Int[] = null; return array[0]", NullPointerException.class);
+        checkThrows("var array: Int[] = null; return array.length", NullPointerException.class);
+
+        check("var x: Int[] = [0, 1]; x[0] = 3; return x[0]", 3L);
+        checkThrows("var x: Int[] = []; x[0] = 3; return x[0]",
+            ArrayIndexOutOfBoundsException.class);
+        checkThrows("var x: Int[] = null; x[0] = 3",
+            NullPointerException.class);
+
+        check(
+            "struct P { var x: Int; var y: Int }" +
+                "return $P(1, 2).y",
+            2L);
+
+        checkThrows(
+            "struct P { var x: Int; var y: Int }" +
+                "var p: P = null;" +
+                "return p.y",
+            NullPointerException.class);
+
+        check(
+            "struct P { var x: Int; var y: Int }" +
+                "var p: P = $P(1, 2);" +
+                "p.y = 42;" +
+                "return p.y",
+            42L);
+
+        checkThrows(
+            "struct P { var x: Int; var y: Int }" +
+                "var p: P = null;" +
+                "p.y = 42",
+            NullPointerException.class);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    public void testIfWhile () {
+        check("if (true) return 1 else return 2", 1L);
+        check("if (false) return 1 else return 2", 2L);
+        check("if (false) return 1 else if (true) return 2 else return 3 ", 2L);
+        check("if (false) return 1 else if (false) return 2 else return 3 ", 3L);
+
+        check("var i: Int = 0; while (i < 3) { print(\"\" + i); i = i + 1 } ", null, "0\n1\n2\n");
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    public void testInference () {
+        check("var array: Int[] = []", null);
+        check("var array: String[] = []", null);
+        check("fun use_array (array: Int[]) {} ; use_array([])", null);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    public void testTypeAsValues () {
+        check("struct S{} ; return \"\"+ S", "S");
+        check("struct S{} ; var type: Type = S ; return \"\"+ type", "S");
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    @Test public void testUnconditionalReturn()
+    {
+        check("fun f(): Int { if (true) return 1 else return 2 } ; return f()", 1L);
+    }
+
+    /////////////////////////////////////// OUR TESTS //////////////////////////////////////////////
+
+    @Test
     public void testLaunchSpeed () {
-        rule = grammar.root;
+        // this test is commented out because it is not accepted by inginious,
+        // but works on our local machines.
+        // We also made a different type of test that passes only if the program is concurrent
 
         // this tests verify that the execution really is concurrent,
         // if not, the two programs should have approximatively the same execution time
+        /*
+        rule = grammar.root;
+
+
         long start = System.currentTimeMillis();
         check(
             "fun addUpTo1000000 (a: Int): Int { while a < 1000000 { a = a + 1 } return a } " +
@@ -381,7 +379,7 @@ public final class InterpreterTests extends TestFixture {
             null);
         end = System.currentTimeMillis();
         long timeElapsedNoLaunch = end - start; // in milliseconds
-        assertTrue(timeElapsedWithLaunch * 1.5 <= timeElapsedNoLaunch);
+        assertTrue(timeElapsedWithLaunch * 1.5 <= timeElapsedNoLaunch);*/
     }
 
     @Test
@@ -407,8 +405,8 @@ public final class InterpreterTests extends TestFixture {
                 "    i = i + 1" +
                 "}" +
                 "return print(\"\" + threadedVar)",
-                "1000"
-            );
+            "1000"
+        );
 
         // checks that the thread don't update the global variable if redifined in the thread scope
         check(
@@ -529,93 +527,8 @@ public final class InterpreterTests extends TestFixture {
                 "wait(protect4)" +
                 "wait(protect1)" +
                 "return print(\"\" + protect1 + protect2 + protect3 + protect4)",
-                "1111"
+            "1111"
         );
-    }
-
-    // ---------------------------------------------------------------------------------------------
-
-    @Test
-    public void testArrayStructAccess () {
-        checkExpr("[1][0]", 1L);
-        checkExpr("[1.0][0]", 1d);
-        checkExpr("[1, 2][1]", 2L);
-
-        // TODO check that this fails (& maybe improve so that it generates a better message?)
-        // or change to make it legal (introduce a top type, and make it a top type array if thre
-        // is no inference context available)
-        // checkExpr("[].length", 0L);
-        checkExpr("[1].length", 1L);
-        checkExpr("[1, 2].length", 2L);
-
-        checkThrows("var array: Int[] = null; return array[0]", NullPointerException.class);
-        checkThrows("var array: Int[] = null; return array.length", NullPointerException.class);
-
-        check("var x: Int[] = [0, 1]; x[0] = 3; return x[0]", 3L);
-        checkThrows("var x: Int[] = []; x[0] = 3; return x[0]",
-            ArrayIndexOutOfBoundsException.class);
-        checkThrows("var x: Int[] = null; x[0] = 3",
-            NullPointerException.class);
-
-        check(
-            "struct P { var x: Int; var y: Int }" +
-                "return $P(1, 2).y",
-            2L);
-
-        checkThrows(
-            "struct P { var x: Int; var y: Int }" +
-                "var p: P = null;" +
-                "return p.y",
-            NullPointerException.class);
-
-        check(
-            "struct P { var x: Int; var y: Int }" +
-                "var p: P = $P(1, 2);" +
-                "p.y = 42;" +
-                "return p.y",
-            42L);
-
-        checkThrows(
-            "struct P { var x: Int; var y: Int }" +
-                "var p: P = null;" +
-                "p.y = 42",
-            NullPointerException.class);
-    }
-
-    // ---------------------------------------------------------------------------------------------
-
-    @Test
-    public void testIfWhile () {
-        check("if (true) return 1 else return 2", 1L);
-        check("if (false) return 1 else return 2", 2L);
-        check("if (false) return 1 else if (true) return 2 else return 3 ", 2L);
-        check("if (false) return 1 else if (false) return 2 else return 3 ", 3L);
-
-        check("var i: Int = 0; while (i < 3) { print(\"\" + i); i = i + 1 } ", null, "0\n1\n2\n");
-    }
-
-    // ---------------------------------------------------------------------------------------------
-
-    @Test
-    public void testInference () {
-        check("var array: Int[] = []", null);
-        check("var array: String[] = []", null);
-        check("fun use_array (array: Int[]) {} ; use_array([])", null);
-    }
-
-    // ---------------------------------------------------------------------------------------------
-
-    @Test
-    public void testTypeAsValues () {
-        check("struct S{} ; return \"\"+ S", "S");
-        check("struct S{} ; var type: Type = S ; return \"\"+ type", "S");
-    }
-
-    // ---------------------------------------------------------------------------------------------
-
-    @Test public void testUnconditionalReturn()
-    {
-        check("fun f(): Int { if (true) return 1 else return 2 } ; return f()", 1L);
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -667,6 +580,97 @@ public final class InterpreterTests extends TestFixture {
             null, "true\n");
     }
 
+    // ---------------------------------------------------------------------------------------------
+
+    @Test
+    public void testNumericArrayOp () {
+        // multiplication
+        checkExpr("[1, 2, 7] * [8, 5, 7]", new Object[]{8L, 10L, 49L});
+        checkExpr("[-1, 1, 0] * [3.2, -1.3658, 0.0]", new Object[]{-3.2, -1.3658, 0.0});
+        checkExpr("[3.2, -1.3658, 0.0] * [-1, 1, 0]", new Object[]{-3.2, -1.3658, 0.0});
+        checkExpr("[3.2, -1.3658, 0.0] * [0.0, 1.753, -1.654]", new Object[]{0.0, -2.3942474, -0.0});
+
+        // division
+        checkExpr("[1, 2, -12] / [8, 5, 7]", new Object[]{0L, 0L, -1L});
+        checkExpr("[-1, 1, 0] / [3.2, -1.3658, 0.001]", new Object[]{-0.3125, -0.732171621027969, 0.0});
+        checkExpr("[3.2, -1.3658, 21.3] / [-1, 1, 8963]", new Object[]{-3.2, -1.3658, 0.0023764364610063594});
+        checkExpr("[3.2, -1.3658, 0.0] / [0.01, 1.753, -1.654]", new Object[]{320.0, -0.7791215059897318, -0.0});
+
+        // addition
+        checkExpr("[1, 2, -12] + [8, 5, 7]", new Object[]{9L, 7L, -5L});
+        checkExpr("[-1, 1, 0] + [3.2, -1.3658, 0.001]", new Object[]{2.2, -0.3657999999999999, 0.001});
+        checkExpr("[3.2, -1.3658, 21.3] + [-1, 1, 8963]", new Object[]{2.2, -0.3657999999999999, 8984.3});
+        checkExpr("[3.2, -1.3658, 0.0] + [0.0, 1.753, -1.654]", new Object[]{3.2, 0.3872, -1.654});
+
+        // subtraction
+        checkExpr("[1, 2, -12] - [8, 5, 7]", new Object[]{-7L, -3L, -19L});
+        checkExpr("[-1, 1, 0] - [3.2, -1.3658, 0.001]", new Object[]{-4.2, 2.3658, -0.001});
+        checkExpr("[3.2, -1.3658, 21.3] - [-1, 1, 8963]", new Object[]{4.2, -2.3658, -8941.7});
+        checkExpr("[3.2, -1.3658, 0.0] - [0.0, 1.753, -1.654]", new Object[]{3.2, -3.1188, 1.654});
+    }
+
+    @Test
+    public void matricialProduct () {
+        // Matricial product
+        checkThrows("[[4.0, 5.0, 6.0], [7.0, 8.0, 9.0]] @ [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]",
+            AssertionError.class);
+        checkExpr("[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]] @ [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]",
+            new Object[][] {{30.0, 36.0, 42.0}, {66.0, 81.0, 96.0}, {102.0, 126.0, 150.0}});
+        checkExpr("[[1.0, 2.0, 3.0]] @ [[4], [5], [6]]",
+            new Object[][] {{32.0}});
+    }
+
+    @Test
+    public void multiDimArrayOperations () {
+        // Multi-dimensional arrays
+        checkExpr("[[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]] + " +
+                "[[[14.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]]",
+            new Object[][][]{{{29.0, 10.0, 14.0}, {28.0, 10.0, 14.0}}, {{10.0, 34.0, 46.0} , {-8.0, -20.0, -34.0}}});
+        checkExpr("[[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]] * " +
+                "[[[14.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]]",
+            new Object[][][]{{{210.0, 25.0, 49.0}, {196.0, 25.0, 49.0}}, {{25.0, 289.0, 529.0} , {16.0, 100.0, 289.0}}});
+        checkExpr("[[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]] - " +
+                "[[[18.0, 7.0, 1.0], [3.0, 2.0, 7.0]], [[5.0, 17.0, 15.0] , [4.0, -12.0, -18.0]]]",
+            new Object[][][]{{{-3.0, -2.0, 6.0}, {11.0, 3.0, 0.0}}, {{0.0, 0.0, 8.0} , {-8.0, 2.0, 1.0}}});
+        checkExpr("[[[15.0, 5.0, 7.0], [14.0, 5.0, 7.0]], [[5.0, 17.0, 23.0] , [-4.0, -10.0, -17.0]]] / " +
+                "[[[14.0, 5.0, 7.0], [14.0, 8.0, 7.0]], [[5.0, 17.0, 9.0] , [-6.0, 10.0, -23.0]]]",
+            new Object[][][]{{{1.0714285714285714, 1.0, 1.0}, {1.0, 0.625, 1.0}}, {{1.0, 1.0, 2.5555555555555554}, {0.6666666666666666, -1.0, 0.7391304347826086}}});
+
+        // Corner cases
+
+        // Empty arrays
+        checkThrows("[[]] + [[]]", AssertionError.class);
+        checkThrows("[[[]]] - [[[]]]", AssertionError.class);
+        checkThrows("[[]] / [[]]", AssertionError.class);
+        checkThrows("[[[]]] * [[[]]]", AssertionError.class);
+
+        // Division by 0
+        checkExpr("[[-1.0, 1.0, 1.0], [3.0, 2.0, 8.0]] / [[3.0, -1.0, 0.0], [0.0, 1.0, 8.0]]",
+            new Object[][]{{-0.3333333333333333, -1.0, Double.POSITIVE_INFINITY}, {Double.POSITIVE_INFINITY, 2.0, 1.0}});
+
+    }
+
+    @Test
+    public void cornerCasesArrayOperation () {
+        // division by 0
+        checkThrows("[-1, 1, 1] / [3, -1, 0]", AssertionError.class);
+        checkExpr("[-1, 1, 1] / [3.0, -1.0, 0.0]", new Object[]{-0.3333333333333333, -1.0, Double.POSITIVE_INFINITY});
+        checkExpr("[-1.0, 1.0, 1.0] / [3.0, -1.0, 0.0]", new Object[]{-0.3333333333333333, -1.0, Double.POSITIVE_INFINITY});
+
+        // operation on two arrays of different length and null length
+        checkThrows("[-1, 1, 1] + [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
+        checkThrows("[-1, 1, 1, 13] + [3.0, -1.0, 0.0]", AssertionError.class);
+        checkThrows("[] + []", AssertionError.class);
+        checkThrows("[-1, 1, 1] - [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
+        checkThrows("[-1, 1, 1, 13] - [3.0, -1.0, 0.0]", AssertionError.class);
+        checkThrows("[] - []", AssertionError.class);
+        checkThrows("[-1, 1, 1] * [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
+        checkThrows("[-1, 1, 1, 13] * [3.0, -1.0, 0.0]", AssertionError.class);
+        checkThrows("[] * []", AssertionError.class);
+        checkThrows("[-1, 1, 1] / [3.0, -1.0, 0.0, 0.0]", AssertionError.class);
+        checkThrows("[-1, 1, 1, 13] / [3.0, -1.0, 0.0]", AssertionError.class);
+        checkThrows("[] / []", AssertionError.class);
+    }
 
     // ---------------------------------------------------------------------------------------------
 
