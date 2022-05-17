@@ -1,14 +1,46 @@
-var threadedVar: Int = 0
-fun add1000() : Int{
+// Examples
+
+fun doStuff(): Int {
+    var uselessVar : Int = 0
+    while uselessVar < 1000 {
+        uselessVar = uselessVar + 1
+    }
+    return uselessVar
+}
+// if we want to assign a variable
+launch var a : Int = doStuff()
+// if we just want to launch a new thread on the function
+// without assigning the return value to a variable
+launch doStuff()
+
+
+
+var globalVar : Int = 0
+fun incrementGlobalVar(): Int {
     var i : Int = 0
-    while  i < 1000 {
+    while i < 1000 {
         protect : {
-            threadedVar = threadedVar + 1
+            globalVar = globalVar + 1
         }
         i = i + 1
     }
     return 1
 }
+
+launch var a1 : Int = incrementGlobalVar()
+launch var a2 : Int = incrementGlobalVar()
+launch var a3 : Int = incrementGlobalVar()
+
+print("value of globalVar : " + globalVar) // << 3000
+
+wait(a1)
+wait(a2)
+wait(a3)
+
+print("value of globalVar : " + globalVar) // 3000
+
+// --------------------------- end of the examples from the report ---------------------------------
+
 
 var threadedVarNoProtect : Int = 0
 fun add1000NoProtect() : Int{
@@ -20,32 +52,12 @@ fun add1000NoProtect() : Int{
     return 1
 }
 
-fun checkThreadedVar(): Bool {
-    if threadedVar == 4000 {
+fun checkThreadedVar(a : Int): Bool {
+    if a == 4000 {
         return true
     }
     return false
 }
-fun checkThreadedVarNoProtect(): Bool {
-    if threadedVarNoProtect == 4000 {
-        return true
-    }
-    return false
-}
-
-launch var thread1 : Int = add1000()
-launch var thread2 : Int = add1000()
-launch var thread3 : Int = add1000()
-launch var thread4 : Int = add1000()
-
-print("is threadedVar == 4000 before wait ? : " + checkThreadedVar())
-
-wait(thread1)
-wait(thread2)
-wait(thread3)
-wait(thread4)
-
-print("is threadedVar == 4000 after wait ? : " + checkThreadedVar())
 
 launch var thread5 : Int = add1000NoProtect()
 launch var thread6 : Int = add1000NoProtect()
@@ -57,5 +69,5 @@ wait(thread6)
 wait(thread7)
 wait(thread8)
 
-print("is threadedVarNoProtect == 4000 ? : " + checkThreadedVarNoProtect())
+print("is threadedVarNoProtect == 4000 ? : " + checkThreadedVar(threadedVarNoProtect))
 
