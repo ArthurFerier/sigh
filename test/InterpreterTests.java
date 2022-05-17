@@ -219,11 +219,14 @@ public final class InterpreterTests extends TestFixture {
             new Object[][][]{{{1.0714285714285714, 1.0, 1.0}, {1.0, 0.625, 1.0}}, {{1.0, 1.0, 2.5555555555555554}, {0.6666666666666666, -1.0, 0.7391304347826086}}});
 
         // Corner cases
+
+        // Empty arrays
         checkThrows("[[]] + [[]]", AssertionError.class);
         checkThrows("[[[]]] - [[[]]]", AssertionError.class);
         checkThrows("[[]] / [[]]", AssertionError.class);
         checkThrows("[[[]]] * [[[]]]", AssertionError.class);
 
+        // Division by 0
         checkExpr("[[-1.0, 1.0, 1.0], [3.0, 2.0, 8.0]] / [[3.0, -1.0, 0.0], [0.0, 1.0, 8.0]]",
             new Object[][]{{-0.3333333333333333, -1.0, Double.POSITIVE_INFINITY}, {Double.POSITIVE_INFINITY, 2.0, 1.0}});
 
@@ -360,7 +363,7 @@ public final class InterpreterTests extends TestFixture {
         rule = grammar.root;
 
         // this tests verify that the execution really is concurrent,
-        // if not, the two programs should have the same execution time
+        // if not, the two programs should have approximatively the same execution time
         long start = System.currentTimeMillis();
         check(
             "fun addUpTo1000000 (a: Int): Int { while a < 1000000 { a = a + 1 } return a } " +

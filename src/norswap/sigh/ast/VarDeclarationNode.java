@@ -1,6 +1,7 @@
 package norswap.sigh.ast;
 
 import norswap.autumn.positions.Span;
+import norswap.sigh.types.Type;
 import norswap.utils.Util;
 
 public final class VarDeclarationNode extends DeclarationNode

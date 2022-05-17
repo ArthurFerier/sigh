@@ -349,11 +349,11 @@ public final class Interpreter
             throw new Error("The two arrays must have the same length: array1.length is " + ar1.length + " and array2.length is " + ar2.length);
         }
 
-        /*if (ar1.length == 0)
-            return new Object[0];*/
-        if (ar1.length == 0) {
+        if (ar1.length == 0)
+            return new Object[0];
+        /*if (ar1.length == 0) {
             throw new Error("No operations allowed on empty arrays"); // TODO, changer
-        }
+        }*/
 
         Object[] res = new Object[ar1.length];
         if (ar1[0].getClass().isArray() && ar2[0].getClass().isArray()) {

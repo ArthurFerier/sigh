@@ -3,8 +3,6 @@ package norswap.sigh;
 import norswap.autumn.Grammar;
 import norswap.sigh.ast.*;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import static norswap.sigh.ast.UnaryOperator.LAUNCH;
 import static norswap.sigh.ast.UnaryOperator.NOT;
 

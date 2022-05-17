@@ -37,3 +37,26 @@ print("Matricial product 2 : "+result)
 
 var a: Float[][] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]
 
+// Empty arrays
+var empty1: Int[] = []
+var empty2: Int[][] = [[]]
+var emptyResult1: Int[] = empty1 + []
+var emptyResult2: Int[][] = empty2 + [[]]
+print("Result : "+emptyResult1)
+print("Result2 : "+emptyResult2)
+
+var empty3: Int[][] = [[], [1, 2, 3], [4, 5, 6]]
+var empty4: Int[][] = [[], [1, 2, 3], [4, 5, 6]]
+var emptyResult: Int[][] = empty3 + empty4
+print("Result : "+emptyResult)
+
+var emptyF: Float[][][] = [[[1.3, 2.8],[]], [[], []]]
+var emptyF2: Float[][][] = [[[1.7, 15.23],[]], [[], []]]
+var resultF: Float[][][] = emptyF * emptyF2
+print("resultF : " + resultF)
+
+
+var IntAndFloat: Float[][][] = [[[], [1, 2, 3]], [[]]] * [[[], [-2.3, 5.6, 8.18]], [[]]]
+print("Float and Int : " + IntAndFloat)
+
+

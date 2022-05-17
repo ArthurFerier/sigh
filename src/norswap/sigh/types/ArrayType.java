@@ -5,11 +5,11 @@ import norswap.sigh.ast.ArrayTypeNode;
 public final class ArrayType extends Type
 {
     public final Type componentType;
-    public final int nDim; // TODO
+    public final Type primitiveType;
 
     public ArrayType (Type componentType) {
         this.componentType = componentType;
-        this.nDim = getDim();
+        this.primitiveType = this.getType();
     }
 
     @Override public String name() {
@@ -24,11 +24,11 @@ public final class ArrayType extends Type
         return componentType.hashCode();
     }
 
-    public int getDim() {
+    public Type getType() {
         if (this.componentType instanceof ArrayType)
-            return 1 + ((ArrayType) this.componentType).getDim();
+            return ((ArrayType) this.componentType).getType();
         else {
-            return 1;
+            return this.componentType;
         }
     }
 }
