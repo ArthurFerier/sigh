@@ -139,6 +139,8 @@ public class GrammarTests extends AutumnTestFixture {
             new BlockNode(null, asList(new ReturnNode(null, null)))));
     }
 
+    /////////////////////////////////////// OUR TESTS //////////////////////////////////////////////
+
     @Test public void testLaunch() {
         rule = grammar.statement;
 
@@ -214,7 +216,8 @@ public class GrammarTests extends AutumnTestFixture {
 
     @Test
     public void testWait() {
-        // simple test, there wasn't anything to do in the sighGrammar to implement the wait function
+        // simple test, there wasn't anything to do
+        // in the sighGrammar to implement the wait function
         rule = grammar.statement;
         ReferenceNode ref = new ReferenceNode(null, "variable");
         ArrayList<ReferenceNode> a = new ArrayList<>();
@@ -261,4 +264,6 @@ public class GrammarTests extends AutumnTestFixture {
             );
 
     }
+
+    // ---------------------------------------------------------------------------------------------
 }
