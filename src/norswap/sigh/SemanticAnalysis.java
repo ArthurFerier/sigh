@@ -299,6 +299,7 @@ public final class SemanticAnalysis
                     FunType funType = r.get(0);
                     r.set(0, funType.paramTypes[(int) r.get(1)]);
                 });
+                ExpressionNode fun = ((FunCallNode) context).function;
             }
             return;
         }
@@ -713,6 +714,12 @@ public final class SemanticAnalysis
         if (left.componentType instanceof ArrayType
             && !(right.componentType instanceof ArrayType)) {
             r.error(arithmeticError(node, left, right), node);
+            return;
+        }
+
+        // Struct case
+        if (!(left.componentType instanceof ArrayType) && !(right.componentType instanceof ArrayType)) {
+            r.error(format("Trying to %s %s with %s those types are not authorized for array operations", node.operator.name().toLowerCase(), left, right), node);
             return;
         }
 

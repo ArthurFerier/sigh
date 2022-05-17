@@ -1,5 +1,4 @@
 // Example of uses of the new Array programming's features of Sigh
-
 // 1D
 var a: Int[] = [1, 3, 5, 7]
 var b: Int[] = [2, 4, 6, 8]
@@ -55,8 +54,25 @@ var emptyF2: Float[][][] = [[[1.7, 15.23],[]], [[], []]]
 var resultF: Float[][][] = emptyF * emptyF2
 print("resultF : " + resultF)
 
-
 var IntAndFloat: Float[][][] = [[[], [1, 2, 3]], [[]]] * [[[], [-2.3, 5.6, 8.18]], [[]]]
 print("Float and Int : " + IntAndFloat)
+
+// Array returned by a function
+fun arrayFun () : Int[][]
+{
+    return [[1], [2, 8], [3]] + [[14], [32, 2], [1]]
+}
+
+var testArr: Int[][] = arrayFun()
+print("test"+testArr)
+
+
+struct Pair {
+    var a: Int
+    var b: Int
+}
+
+var pairArray: Pair[] = [$Pair(1, 2), $Pair(10, -3)]
+var sumStruct: Pair[] = pairArray + [$Pair(1, 2), $Pair(10, -3)]
 
 

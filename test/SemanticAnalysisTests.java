@@ -274,6 +274,14 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
             "Trying to subtract Float[][] with Float[]");
         failureInputWith("return [[3, -1, 0], [1, 2, 3]] - [1.0, 2.6]",
             "Trying to subtract Int[][] with Float[]");
+        failureInputWith("struct Pair {\n" +
+                "    var a: Int\n" +
+                "    var b: Int\n" +
+                "}\n" +
+                "\n" +
+                "var pairArray: Pair[] = [$Pair(1, 2), $Pair(10, -3)]\n" +
+                "return pairArray @ [$Pair(1, 2), $Pair(10, -3)]",
+            "Trying to subtract Pair[] with Pair[] those types are not authorized for array operations");
 
         // multiply
         failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] * [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
@@ -293,6 +301,14 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
             "Trying to multiply Float[][] with Float[]");
         failureInputWith("return [[3, -1, 0], [1, 2, 3]] * [1.0, 2.6]",
             "Trying to multiply Int[][] with Float[]");
+        failureInputWith("struct Pair {\n" +
+                "    var a: Int\n" +
+                "    var b: Int\n" +
+                "}\n" +
+                "\n" +
+                "var pairArray: Pair[] = [$Pair(1, 2), $Pair(10, -3)]\n" +
+                "return pairArray @ [$Pair(1, 2), $Pair(10, -3)]",
+            "Trying to multiply Pair[] with Pair[] those types are not authorized for array operations");
 
         // divide
         failureInputWith("return [[\"oui\", \"oui\", \"oui\"], [\"oui\", \"oui\", \"oui\"]] / [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]",
@@ -312,6 +328,14 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
             "Trying to divide Float[][] with Float[]");
         failureInputWith("return [[3, -1, 0], [1, 2, 3]] / [1.0, 2.6]",
             "Trying to divide Int[][] with Float[]");
+        failureInputWith("struct Pair {\n" +
+                "    var a: Int\n" +
+                "    var b: Int\n" +
+                "}\n" +
+                "\n" +
+                "var pairArray: Pair[] = [$Pair(1, 2), $Pair(10, -3)]\n" +
+                "return pairArray @ [$Pair(1, 2), $Pair(10, -3)]",
+            "Trying to divide Pair[] with Pair[] those types are not authorized for array operations");
 
         // Matricial product
         failureInputWith("return [[1.0], [2.0], [3.0]] @ [[true, false, false]]",
@@ -320,6 +344,14 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
             "Trying to mat_product Float[] with String[]");
         failureInputWith("return [[1.0], [2.0], [3.0]] @ [[null, null, null]]",
             "Trying to mat_product Float[] with Null[]");
+        failureInputWith("struct Pair {\n" +
+                "    var a: Int\n" +
+                "    var b: Int\n" +
+                "}\n" +
+                "\n" +
+                "var pairArray: Pair[] = [$Pair(1, 2), $Pair(10, -3)]\n" +
+                "return pairArray @ [$Pair(1, 2), $Pair(10, -3)]",
+            "Trying to mat_product Pair[] with Pair[] those types are not authorized for array operations");
     }
 
     // ---------------------------------------------------------------------------------------------

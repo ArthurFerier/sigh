@@ -358,7 +358,7 @@ public final class InterpreterTests extends TestFixture {
 
     // ---------------------------------------------------------------------------------------------
 
-    @Test
+    /*@Test
     public void testLaunchSpeed () {
         rule = grammar.root;
 
@@ -382,7 +382,7 @@ public final class InterpreterTests extends TestFixture {
         end = System.currentTimeMillis();
         long timeElapsedNoLaunch = end - start; // in milliseconds
         assertTrue(timeElapsedWithLaunch * 1.5 <= timeElapsedNoLaunch);
-    }
+    }*/
 
     @Test
     public void testLaunchGlobalVariables () {

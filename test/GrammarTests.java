@@ -46,6 +46,8 @@ public class GrammarTests extends AutumnTestFixture {
     @Test
     public void testNumericBinary () {
         successExpect("1 + 2", new BinaryExpressionNode(null, intlit(1), ADD, intlit(2)));
+        successExpect("[1] + [2]", new BinaryExpressionNode(null, new ArrayLiteralNode(null, asList(intlit(1))), ADD,
+            new ArrayLiteralNode(null, asList(intlit(2)))));
         successExpect("2 - 1", new BinaryExpressionNode(null, intlit(2), SUBTRACT,  intlit(1)));
         successExpect("2 * 3", new BinaryExpressionNode(null, intlit(2), MULTIPLY, intlit(3)));
         successExpect("2 / 3", new BinaryExpressionNode(null, intlit(2), DIVIDE, intlit(3)));
@@ -77,6 +79,7 @@ public class GrammarTests extends AutumnTestFixture {
                 ADD,
                 intlit(1)))));
     }
+
 
     // ---------------------------------------------------------------------------------------------
 
