@@ -104,6 +104,26 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
 
     // ---------------------------------------------------------------------------------------------
 
+    // TODO
+    @Test public void testEmptyArray() {
+        successInput("var a: Float[] = []");
+        successInput("var a: Int[] = []");
+        successInput("var a: Float[][] = [[]]");
+        successInput("var a: Int[][] = [[]]");
+        successInput("var a: Float[][][] = [[[]]]");
+        successInput("var a: Bool[][][] = [[[]]]");
+        successInput("var a: String[][][] = [[[]]]");
+        successInput("var a: Int[][][] = [[[]]]");
+        successInput("var a: Int[][][] = [[[], [1, 2, 3]], [[]]]");
+
+        successInput("var a: Int[][][] = [[[], [1, 2, 3]], [[]]] * [[[], [-2, 5, 8]], [[]]]");
+
+        failureInputWith("var a: Int[] = [[]]", "incompatible initializer type provided for variable `a`: expected Int[] but got Int[][]");
+        failureInputWith("var a: Float[] = [[[]]]", "incompatible initializer type provided for variable `a`: expected Float[] but got Float[][][]");
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
     @Test public void testNumericArrayOperation() {
         // multiplication
         successInput("return [1, 2, 7] * [8, 5, 7]");
@@ -302,8 +322,10 @@ public final class SemanticAnalysisTests extends UraniumTestFixture
             "Trying to mat_product Float[] with Null[]");
     }
 
+    // ---------------------------------------------------------------------------------------------
 
     @Test public void testAssignationArrayMultipleDim() {
+        // Those tests make sure that the type returned by array operations is coherent
         // big multi dim
         successInput("var a: Float[][] = [[-1, 1, 0], [15, -36, 789]] + [[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]");
         successInput("var b: Float[][][][] = [[[[3.2, -1.3658, 0.0], [1.0, 2.0, 3.0]]]] / [[[[-1, 1, 0], [15, -36, 789]]]]");

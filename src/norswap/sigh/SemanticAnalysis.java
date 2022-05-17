@@ -267,10 +267,31 @@ public final class SemanticAnalysis
 
             final SighNode context = this.inferenceContext;
 
-            if (context instanceof VarDeclarationNode)
-                R.rule(node, "type")
-                .using(context, "type")
-                .by(Rule::copyFirst);
+            if (context instanceof VarDeclarationNode) {
+                /*R.rule(node, "type")
+                    .using(context, "type")
+                    .by(Rule::copyFirst);*/
+                TypeNode finalType = ((VarDeclarationNode) context).type;
+                while (((ArrayTypeNode) finalType).componentType instanceof ArrayTypeNode) {
+                     finalType = ((ArrayTypeNode) finalType).componentType;
+                }
+                String typeName = ((SimpleTypeNode) ((ArrayTypeNode) finalType).componentType).name;
+                if (typeName.equals("Int")) {
+                    R.set(node, "type", new ArrayType(IntType.INSTANCE));
+                }
+                if (typeName.equals("Float")) {
+                    R.set(node, "type", new ArrayType(FloatType.INSTANCE));
+                }
+                if (typeName.equals("Bool")) {
+                    R.set(node, "type", new ArrayType(BoolType.INSTANCE));
+                }
+                if (typeName.equals("String")) {
+                    R.set(node, "type", new ArrayType(StringType.INSTANCE));
+                }
+                if (typeName.equals("Null")) {
+                    R.set(node, "type", new ArrayType(NullType.INSTANCE));
+                }
+            }
             else if (context instanceof FunCallNode) {
                 R.rule(node, "type")
                 .using(((FunCallNode) context).function.attr("type"), node.attr("index"))
